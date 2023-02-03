@@ -4,7 +4,7 @@
 // Include mc_scverify.h for CCS_* macros
 #include <mc_scverify.h>
 
-template<typename IDTYPE, typename ODTYPE>
+template<typename IDTYPE, typename WDTYPE, typename ODTYPE>
 class ProcessingElement{
 public:
     ProcessingElement(){}

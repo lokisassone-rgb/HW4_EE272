@@ -60,9 +60,11 @@ public:
 
 
             // -------------------------------
-            // Create a loop for a "run" of the systolic array.
-            // The number of steps in a run of the systolic array is equal to:
-            // the ramp-up time + number of pixels + flush time
+            // Create the inner loop of the systolic array.
+            // The number of steps in a run of the systolic array is equal to the
+            // number of rows of outputs passing through the systolic array + the
+            // time taken by the skew registers. Remember that we have skew register
+            // at both the input and output sides of the systolic array.
             // Your code starts here
 
             // Your code ends here 
@@ -70,8 +72,7 @@ public:
             // -------------------------------
 
                 // -------------------------------
-                // If you are in the ramp up time, read in weights from the channel
-                // and store it in the weights array
+                // Read in weights from the channel and store it in the weights array
                 // Your code starts here
 
                 // Your code ends here

@@ -18,11 +18,6 @@ struct PackedInt {
   }  
 };
 
-template <size_t width, size_t EXTENT_0, size_t EXTENT_1>
-struct PackedInt2D {
-  PackedInt<width, EXTENT_0> value[EXTENT_1];
-};
-
 template<typename T, int N>
 struct chanStruct{
   T data[N];
