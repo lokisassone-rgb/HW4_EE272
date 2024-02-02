@@ -9,13 +9,18 @@ template <size_t width, size_t EXTENT_0>
 struct PackedInt {
   ac_int<width> value[EXTENT_0];
 
-  const char * to_string() {
+  std::string to_string() {
     std::stringstream ss;
     for (int i = 0; i < EXTENT_0; i++) {
       ss << value[i] << " ";
     }
-    return ss.str().c_str();
+    return ss.str();
   }  
+};
+
+template <size_t width, size_t EXTENT_0, size_t EXTENT_1>
+struct PackedInt2D {
+  PackedInt<width, EXTENT_0> value[EXTENT_1];
 };
 
 template<typename T, int N>
@@ -48,22 +53,28 @@ struct Params {
 
 #define INPUT_BUFFER_SIZE  4096 // Input buffer size per IC0 per bank
 #define WEIGHT_BUFFER_SIZE 8192 // Weight buffer size per OC0 per bank
-#define ACCUMULATION_BUFFER_SIZE 196
+#define ACCUMULATION_BUFFER_SIZE 256
 
 typedef ac_int<INPUT_PRECISION,true> IDTYPE; 
 typedef ac_int<WEIGHT_PRECISION,true> WDTYPE; 
 typedef ac_int<OUTPUT_PRECISION,true> ODTYPE; 
 
 
+// Max values for resnet-18
+#define OY1_MAX 8
+#define OY0_MAX 14
+#define OX1_MAX 8
+#define OX0_MAX 14
+#define OC1_MAX 32
+#define OC0_MAX 16
+#define IC1_MAX 32
+#define IC0_MAX 16
 #define FX_MAX 7
 #define FY_MAX 7
-#define IC0_MAX 512
-#define OX0_MAX 112
-#define OY0_MAX 112
-#define FX_MAX 7
-#define FY_MAX 7
-#define IC1_MAX 512
-#define OC1_MAX 512
+#define STRIDE_MAX 2
+
+#define IX0_MAX ((OX0_MAX-1)*STRIDE_MAX+FX_MAX)
+#define IY0_MAX ((OY0_MAX-1)*STRIDE_MAX+FY_MAX)
 
 #endif
 

@@ -29,6 +29,18 @@ gui:
 test/Conv.v1: 
 	$(CATAPULT) -shell -file scripts/run_c_test.tcl
 
+c_fast_test:
+	mkdir -p build
+	cd build && make -f ../buffer.mk run_conv_tb
+
+weight_c_test:
+	mkdir -p build
+	cd build && make -f ../buffer.mk run_weight_tb
+
+input_c_test:
+	mkdir -p build
+	cd build && make -f ../buffer.mk run_input_tb
+
 c_test: test/Conv.v1
 	cd test/Conv.v1 && make -f scverify/Verify_orig_cxx_osci.mk sim
 
@@ -46,3 +58,4 @@ clean:
 
 clean_test:
 	rm -rf ./build/Conv.v1/rtl.v
+

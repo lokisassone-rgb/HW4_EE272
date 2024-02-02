@@ -16,6 +16,29 @@
 #include "ProcessingElement.h"
 #include "Fifo.h"
 
+// Define this macro for debug logging
+#define HLS_DEBUG 0
+#if HLS_DEBUG
+#ifndef __SYNTHESIS__
+#include <iostream>
+#include <fstream>
+#include <string>
+
+// Only works for square arrays
+template <typename T>
+void log_matrix(std::ofstream& file, T* data, int iteration, int side_length) {
+    file << "Iteration: " << iteration << '\n';
+    for (int r = 0; r < side_length; r++) {
+        for (int c = 0; c < side_length; c++) {
+            file << int(data[r][c].to_int()) << ' ';
+        }
+        file << '\n';
+    }
+    file << '\n';
+}
+#endif
+#endif
+
 
 struct LoopIndices{
     uint_16 ic1_idx;
@@ -28,10 +51,44 @@ struct LoopIndices{
 template <typename IDTYPE, typename WDTYPE, typename ODTYPE, int OC0, int IC0>
 class SystolicArrayCore
 {
+    #if HLS_DEBUG
+    #ifndef __SYNTHESIS__
+    // Create log file information
+    std::ofstream input_file;
+    std::ofstream weight_file;
+    std::ofstream psum_file;
+    #endif
+    #endif
+
+
 public:
-    SystolicArrayCore() {}
+    SystolicArrayCore() {
+        #if HLS_DEBUG
+        #ifndef __SYNTHESIS__
+
+        // Creates filenames
+        std::string input_filename = "input_file";
+        std::string weight_filename = "weight_file";
+        std::string psum_filename = "psum_file";
+
+        // Opens log files when debugging
+        input_file.open(input_filename.c_str());
+        weight_file.open(weight_filename.c_str());
+        psum_file.open(psum_filename.c_str());
+        bool open_success = true;
+        open_success = open_success && input_file.is_open();
+        open_success = open_success && weight_file.is_open();
+        open_success = open_success && psum_file.is_open();
+
+        if (!open_success) {
+            std::cerr << "Failed to open one or more log files." << std::endl;
+        }
+        #endif
+        #endif
+    }
 
 #pragma hls_design interface
+#pragma hls_pipeline_init_interval 1
     void CCS_BLOCK(run)(
         ac_channel<PackedInt<INPUT_PRECISION, IC0> > &input, 
         ac_channel<PackedInt<WEIGHT_PRECISION, OC0> > &weight, 
@@ -40,15 +97,16 @@ public:
         ac_channel<LoopIndices> &loopIndicesIn)
     {
         #ifndef __SYNTHESIS__
-        //assert(params.OX0 * params.OY0 < ACCUMULATION_BUFFER_SIZE);
+        // assert(params.OX0 * params.OY0 <= ACCUMULATION_BUFFER_SIZE);
         // Debug example:
         // printf("paramsIn channel size: %d\n", paramsIn.size());
-        // printf("weigh channel size: %d\n", weight.size());
+        // printf("loopIndicesIn channel size: %d\n", loopIndicesIn.size());
+        // printf("weight channel size: %d\n", weight.size());
         // printf("input channel size: %d\n\n", input.size());
         #endif
 
         #ifndef __SYNTHESIS__
-        while(paramsIn.available(1))
+        while(loopIndicesIn.available(1))
         #endif
         {
             // -------------------------------
@@ -60,11 +118,9 @@ public:
 
 
             // -------------------------------
-            // Create the inner loop of the systolic array.
-            // The number of steps in a run of the systolic array is equal to the
-            // number of rows of outputs passing through the systolic array + the
-            // time taken by the skew registers. Remember that we have skew register
-            // at both the input and output sides of the systolic array.
+            // Create a loop for a "run" of the systolic array.
+            // The number of steps in a run of the systolic array is equal to:
+            // the ramp-up time + number of pixels + flush time
             // Your code starts here
 
             // Your code ends here 
@@ -72,7 +128,8 @@ public:
             // -------------------------------
 
                 // -------------------------------
-                // Read in weights from the channel and store it in the weights array
+                // If you are in the ramp up time, read in weights from the channel
+                // and store it in the weights array
                 // Your code starts here
 
                 // Your code ends here
@@ -90,7 +147,7 @@ public:
                 // -------------------------------
 
                 // Debug example:        
-                // printf("in_col: %s\n", in_col.to_string());
+                // printf("in_col: %s\n", in_col.to_string().c_str());
 
 
                 /*
@@ -125,7 +182,7 @@ public:
                 // -------------------------------
                 
                 // Debug example:
-                // printf("psum_buf: %s\n", psum_buf.to_string());
+                // printf("psum_buf: %s\n", psum_buf.to_string().c_str());
 
                 /*
                  * FIFOs for partial outputs coming in to the systolic array
@@ -155,6 +212,15 @@ public:
 
                 // Your code ends here
                 // -------------------------------
+
+                // Captures PE register state into log files
+                #if HLS_DEBUG
+                #ifndef __SYNTHESIS__
+                log_matrix(input_file, input_reg, step, OC0);
+                log_matrix(weight_file, weight_reg, step, OC0);
+                log_matrix(psum_file, psum_reg, step, OC0);
+                #endif
+                #endif
                 
 
                 /*
@@ -185,6 +251,7 @@ public:
 
                 // Your code ends here
                 // -------------------------------
+                if (step == step_bound-1) break;
             }
         }
     
