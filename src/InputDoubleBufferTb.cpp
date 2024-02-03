@@ -111,7 +111,7 @@ int run_layer(Params params) {
               errCnt++;
               if (errCnt < 10) {
                 printf("***ERROR***\n");
-                printf("Expected = %s\nActual = %s\n", input_actual.to_string().c_str(), input_expected.to_string().c_str());
+                printf("Expected = %s\nActual = %s\n", input_expected.to_string().c_str(), input_actual.to_string().c_str());
               }
         }
     }
