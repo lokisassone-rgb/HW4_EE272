@@ -27,7 +27,9 @@ public:
         for (int i=0; i < numberofTiles; i++){
             printf("[DEBUG] Tile i=%d\n", i);
             for (int j=0; j < sizeofDoubleBuffer; j++){
-                tempdinwrite = 0;
+                for (int idx = 0; idx < IC0; idx++) {
+                    tempdinwrite.value[idx] = 0;
+                }
                 for (int k=0; k<IC0/4; k++){
                     tempdinread = din.read();
                     printf("[DEBUG] din.read() j=%d k=%d: ", j, k);
