@@ -20,9 +20,6 @@ public:
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
         int sizeofDoubleBuffer = ix0*iy0*params.IC1;
 
-        printf("[DEBUG] Params: OX1=%d OY1=%d OX0=%d OY0=%d STRIDE=%d FX=%d FY=%d IC1=%d\n", (int)params.OX1, (int)params.OY1, (int)params.OX0, (int)params.OY0, (int)params.STRIDE, (int)params.FX, (int)params.FY, (int)params.IC1);
-        printf("[DEBUG] numberofTiles=%d, ix0=%d, iy0=%d, sizeofDoubleBuffer=%d\n", numberofTiles, ix0, iy0, sizeofDoubleBuffer);
-
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
@@ -30,8 +27,6 @@ public:
         for (int i=0; i < numberofTiles; i++){
             printf("[DEBUG] Tile i=%d\n", i);
             for (int j=0; j < sizeofDoubleBuffer; j++){
-                // Optionally clear tempdinwrite for each j
-                for (int idx=0; idx<IC0; idx++) tempdinwrite.value[idx] = 0;
                 for (int k=0; k<IC0/4; k++){
                     tempdinread = din.read();
                     printf("[DEBUG] din.read() j=%d k=%d: ", j, k);
