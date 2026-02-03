@@ -21,7 +21,7 @@ public:
         int sizeofDoubleBuffer = ix0*iy0*params.IC1;
 
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
-        PackedInt<INPUT_PRECISION, 4> tempdinread;
+        //PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
 
         for (int i=0; i < numberofTiles; i++){
@@ -31,12 +31,10 @@ public:
                     tempdinwrite.value[idx] = 0;
                 }
                 for (int k=0; k<IC0/4; k++){
-                    tempdinread = din.read();
-
-                    tempdinwrite.value[k*4] = tempdinread.value[0];
-                    tempdinwrite.value[k*4+1] = tempdinread.value[1];
-                    tempdinwrite.value[k*4+2] = tempdinread.value[2];
-                    tempdinwrite.value[k*4+3] = tempdinread.value[3];
+                    tempdinwrite.value[k*4] = din.value[0];
+                    tempdinwrite.value[k*4+1] = din.value[1];
+                    tempdinwrite.value[k*4+2] = din.value[2];
+                    tempdinwrite.value[k*4+3] = din.value[3];
                 }
                 printf("[DEBUG] tempdinwrite for j=%d: ", j);
                 for (int v=0; v<IC0; v++) printf("%d ", (int)tempdinwrite.value[v]);
