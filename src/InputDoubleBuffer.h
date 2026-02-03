@@ -27,6 +27,7 @@ public:
         for (int i=0; i < numberofTiles; i++){
             printf("[DEBUG] Tile i=%d\n", i);
             for (int j=0; j < sizeofDoubleBuffer; j++){
+                tempdinwrite = 0;
                 for (int k=0; k<IC0/4; k++){
                     tempdinread = din.read();
                     printf("[DEBUG] din.read() j=%d k=%d: ", j, k);
@@ -41,7 +42,6 @@ public:
                 for (int v=0; v<IC0; v++) printf("%d ", (int)tempdinwrite.value[v]);
                 printf("\n");
                 temp.data[j] = tempdinwrite;
-                dout.write(temp);
             }
             // Print temp.data before writing
             printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
@@ -50,7 +50,7 @@ public:
                 for (int v=0; v<IC0; v++) printf("%d ", (int)temp.data[jj].value[v]);
                 printf("\n");
             }
-            //dout.write(temp);
+            dout.write(temp);
         }
 
         // Your code ends here
