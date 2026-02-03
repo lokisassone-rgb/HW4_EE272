@@ -39,13 +39,9 @@ public:
                     tempdinwrite.value[k*4+3] = tempdinread.value[3];
                 }
                 
-                if (j > 0) {
-                    temp.data[j-1] = tempdinwrite_prev;
-                }
-                // Save current for next iteration
-                for (int idx = 0; idx < IC0; idx++) tempdinwrite_prev.value[idx] = tempdinwrite.value[idx];
+                temp.data[j] = tempdinwrite;
             }
-            temp.data[sizeofDoubleBuffer-1] = tempdinwrite_prev;
+            
             // Print temp.data before writing
             printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
             for (int jj=0; jj<sizeofDoubleBuffer; jj++) {
@@ -82,7 +78,7 @@ public:
 
         for (int i = 0; i < numberofTiles; i++){
             temp = din.read();
-            for (int j = -1; j < sizeofDoubleBuffer; j++){
+            for (int j = 0; j < sizeofDoubleBuffer; j++){
                 dout.write(temp.data[j]);
             }
         }
