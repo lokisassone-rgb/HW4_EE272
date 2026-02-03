@@ -15,11 +15,14 @@ public:
         // -------------------------------
         // Your code starts here
         Params params = paramsIn.read();
-        int numberofTiles = params.OX1*params.OY1;
+        int numberofTiles = params.OX1 * params.OY1;
         int ix0 = (params.OX0 -1 )*params.STRIDE + params.FX;
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
         int sizeofDoubleBuffer = ix0*iy0*params.IC1;
 
+        printf("[DEBUG] Params: OX1=%d, OY1=%d, OX0=%d, OY0=%d, FX=%d, FY=%d, STRIDE=%d, IC1=%d\n", 
+               (int)params.OX1, (int)params.OY1, (int)params.OX0, (int)params.OY0, 
+               (int)params.FX, (int)params.FY, (int)params.STRIDE, (int)params.IC1);
         printf("[DEBUG] InputDoubleBufferWriter: numberofTiles=%d, sizeofDoubleBuffer=%d\n", numberofTiles, sizeofDoubleBuffer);
 
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
