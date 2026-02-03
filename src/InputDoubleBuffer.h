@@ -32,9 +32,7 @@ public:
                 }
                 for (int k=0; k<IC0/4; k++){
                     tempdinread = din.read();
-                    printf("[DEBUG] din.read() j=%d k=%d: ", j, k);
-                    for (int v=0; v<4; v++) printf("%d ", (int)tempdinread.value[v]);
-                    printf("\n");
+
                     tempdinwrite.value[k*4] = tempdinread.value[0];
                     tempdinwrite.value[k*4+1] = tempdinread.value[1];
                     tempdinwrite.value[k*4+2] = tempdinread.value[2];
@@ -43,7 +41,7 @@ public:
                 printf("[DEBUG] tempdinwrite for j=%d: ", j);
                 for (int v=0; v<IC0; v++) printf("%d ", (int)tempdinwrite.value[v]);
                 printf("\n");
-                temp.data[j] = tempdinwrite;
+                temp.data[j - 1] = tempdinwrite;
             }
             // Print temp.data before writing
             printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
