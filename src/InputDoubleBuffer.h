@@ -35,6 +35,7 @@ public:
                     tempdinwrite.value[k*4+3] = tempdinread.value[3];
                 }        
             temp.data[j] = tempdinwrite;
+            tempdinwrite = PackedInt<INPUT_PRECISION, IC0>(); // reset
             }
                 dout.write(temp);
         }
