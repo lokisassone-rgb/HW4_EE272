@@ -20,6 +20,8 @@ public:
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
         int sizeofDoubleBuffer = ix0*iy0*params.IC1;
 
+        printf("[DEBUG] InputDoubleBufferWriter: numberofTiles=%d, sizeofDoubleBuffer=%d\n", numberofTiles, sizeofDoubleBuffer);
+
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
@@ -43,12 +45,14 @@ public:
             }
             
             // Print temp.data before writing
+            /*
             printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
             for (int jj=0; jj<sizeofDoubleBuffer; jj++) {
                 printf("  j=%d: ", jj);
                 for (int v=0; v<IC0; v++) printf("%d ", (int)temp.data[jj].value[v]);
                 printf("\n");
             }
+            */
             dout.write(temp);
         }
         // Your code ends here
