@@ -24,37 +24,24 @@ public:
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite_prev;
+        PackedInt<INPUT_PRECISION, IN_PAR> temp_prev;
 
-        for (int i=0; i < numberofTiles; i++){
-            printf("[DEBUG] Tile i=%d\n", i);
-            for (int j=0; j < sizeofDoubleBuffer; j++){
-                for (int idx = 0; idx < IC0; idx++) {
-                    tempdinwrite.value[idx] = 0;
-                }
-                for (int k=0; k<IC0/4; k++){
-                    tempdinread = din.read();
-                    tempdinwrite.value[k*4] = tempdinread.value[0];
-                    tempdinwrite.value[k*4+1] = tempdinread.value[1];
-                    tempdinwrite.value[k*4+2] = tempdinread.value[2];
-                    tempdinwrite.value[k*4+3] = tempdinread.value[3];
-                }
-                
-                if (j > 0) {
-                    temp.data[j-1] = tempdinwrite_prev;
-                }
-                // Save current for next iteration
-                for (int idx = 0; idx < IC0; idx++) tempdinwrite_prev.value[idx] = tempdinwrite.value[idx];
+        bool first = true;
+        for (int i = 0; i < numberofTiles; i++) {
+            PackedInt<INPUT_PRECISION, IC0> temp;
+            for (int j = 0; j < sizeofDoubleBuffer; j++) {
+                tempdinread = din.read();
+                temp.data[j] = tempdinread;
             }
-            temp.data[sizeofDoubleBuffer-1] = tempdinwrite_prev;
-            // Print temp.data before writing
-            printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
-            for (int jj=0; jj<sizeofDoubleBuffer; jj++) {
-                printf("  j=%d: ", jj);
-                for (int v=0; v<IC0; v++) printf("%d ", (int)temp.data[jj].value[v]);
-                printf("\n");
+            if (!first) {
+                dout.write(temp_prev);
+            } else {
+                first = false;
             }
-            dout.write(temp);
+            temp_prev = temp;
         }
+        // Write the last tile after the loop
+        dout.write(temp_prev);
         // Your code ends here
         // -------------------------------
     }
