@@ -21,8 +21,9 @@ public:
         int sizeofDoubleBuffer = ix0*iy0*params.IC1;
 
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
-        //PackedInt<INPUT_PRECISION, 4> tempdinread;
+        PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
+        PackedInt<INPUT_PRECISION, IC0> tempdinwrite_prev;
 
         for (int i=0; i < numberofTiles; i++){
             printf("[DEBUG] Tile i=%d\n", i);
@@ -31,15 +32,19 @@ public:
                     tempdinwrite.value[idx] = 0;
                 }
                 for (int k=0; k<IC0/4; k++){
-                    tempdinwrite.value[k*4] = din.value[0];
-                    tempdinwrite.value[k*4+1] = din.value[1];
-                    tempdinwrite.value[k*4+2] = din.value[2];
-                    tempdinwrite.value[k*4+3] = din.value[3];
+                    tempdinread = din.read();
+                    tempdinwrite.value[k*4] = tempdinread.value[0];
+                    tempdinwrite.value[k*4+1] = tempdinread.value[1];
+                    tempdinwrite.value[k*4+2] = tempdinread.value[2];
+                    tempdinwrite.value[k*4+3] = tempdinread.value[3];
                 }
                 printf("[DEBUG] tempdinwrite for j=%d: ", j);
                 for (int v=0; v<IC0; v++) printf("%d ", (int)tempdinwrite.value[v]);
-                printf("\n");
-                temp.data[j - 1] = tempdinwrite;
+                if (j > 0) {
+                    temp.data[j-1] = tempdinwrite_prev;
+                }
+                // Save current for next iteration
+                for (int idx = 0; idx < IC0; idx++) tempdinwrite_prev.value[idx] = tempdinwrite.value[idx];
             }
             // Print temp.data before writing
             printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
