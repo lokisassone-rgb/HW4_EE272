@@ -46,6 +46,7 @@ public:
                 // Save current for next iteration
                 for (int idx = 0; idx < IC0; idx++) tempdinwrite_prev.value[idx] = tempdinwrite.value[idx];
             }
+            temp.data[sizeofDoubleBuffer-1] = tempdinwrite_prev;
             // Print temp.data before writing
             printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
             for (int jj=0; jj<sizeofDoubleBuffer; jj++) {
