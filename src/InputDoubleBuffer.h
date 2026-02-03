@@ -43,7 +43,9 @@ public:
                 printf("[DEBUG] tempdinwrite for j=%d: ", j);
                 for (int v=0; v<IC0; v++) printf("%d ", (int)tempdinwrite.value[v]);
                 printf("\n");
-                temp.data[j] = tempdinwrite;
+                    if (j > 0) {
+                        temp.data[j-1] = tempdinwrite;
+                    }
             }
             // Print temp.data before writing
             printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
@@ -54,6 +56,11 @@ public:
             }
             dout.write(temp);
         }
+            // After the loop, assign the last tempdinwrite to the last position
+            printf("[DEBUG] temp.data for last j=%d: ", (int)(sizeofDoubleBuffer-1));
+            for (int v=0; v<IC0; v++) printf("%d ", (int)tempdinwrite.value[v]);
+            printf("\n");
+            temp.data[sizeofDoubleBuffer-1] = tempdinwrite;
 
         // Your code ends here
         // -------------------------------
