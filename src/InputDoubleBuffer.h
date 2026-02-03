@@ -14,6 +14,30 @@ public:
     {
         // -------------------------------
         // Your code starts here
+        Params params = paramsIn.read();
+        int numberofTiles = params.OX1*params.OY1;
+        int ix0 = (params.OX0 -1 )*params.STRIDE + params.FX;
+        int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
+        int sizeofDoubleBuffer = ix0*iy0*params.IC1;
+
+        chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
+        PackedInt<INPUT_PRECISION, 4> tempdinread;
+        PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
+
+        for (int i=0; i < numberofTiles; i++){
+            for (int j=0; j < sizeofDoubleBuffer; j++){
+                for (int k=0; k<IC0/4; k++){
+
+                    tempdinread = din.read();
+                    tempdinwrite.value[k*4] = tempdinread.value[0];
+                    tempdinwrite.value[k*4+1] = tempdinread.value[1];
+                    tempdinwrite.value[k*4+2] = tempdinread.value[2];
+                    tempdinwrite.value[k*4+3] = tempdinread.value[3];
+                }        
+            temp.data[j] = tempdinwrite;
+            }
+                dout.write(temp);
+        }
 
         // Your code ends here
         // -------------------------------
