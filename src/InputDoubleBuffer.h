@@ -82,7 +82,7 @@ public:
 
         for (int i = 0; i < numberofTiles; i++){
             temp = din.read();
-            for (int j = 0; j < sizeofDoubleBuffer; j++){
+            for (int j = -1; j < sizeofDoubleBuffer; j++){
                 dout.write(temp.data[j]);
             }
         }
