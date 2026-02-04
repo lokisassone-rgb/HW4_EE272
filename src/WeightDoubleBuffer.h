@@ -32,9 +32,9 @@ public:
                                     }
                                 }
                             }
+                            dout.write(tile);
                         }
                     }
-                    dout.write(tile);
                 }
             }
         };
