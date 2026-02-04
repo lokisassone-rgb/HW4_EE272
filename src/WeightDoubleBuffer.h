@@ -3,6 +3,7 @@
 
 
 template <int size, int IC0, int OC0>
+printf("size = %d\n", size);
 class WeightDoubleBufferWriter{
 public:
     WeightDoubleBufferWriter(){}
@@ -16,18 +17,18 @@ public:
         // Your code starts here
         Params params = paramsIn.read();
 
-        for (uint_16 oy1 = 0; oy1 < params.OY1; oy1++){
-            for (uint_16 ox1 = 0; ox1 < params.OX1; ox1++){
-                for (uint_16 oc1 = 0; oc1 < params.OC1; oc1++){
+        for (int oy1 = 0; oy1 < params.OY1; oy1++){
+            for (int ox1 = 0; ox1 < params.OX1; ox1++){
+                for (int oc1 = 0; oc1 < params.OC1; oc1++){
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> tile;
                     PackedInt<WEIGHT_PRECISION, 4> input;
                 
                     //define size of a weight tile (IC1*IC0*FX*FY)
-                    uint_16 numberofWeightsPerTile = params.IC1 * IC0 * (params.FX) * (params.FY);
-                    for (uint_16 i = 0; i < numberofWeightsPerTile; i++) {
-                        for (uint_16 weight_index = 0; weight_index < OC0/4; weight_index++){
+                    int numberofWeightsPerTile = int(params.IC1) * IC0 * int(params.FX) * int(params.FY);
+                    for (int i = 0; i < numberofWeightsPerTile; i++) {
+                        for (int weight_index = 0; weight_index < OC0/4; weight_index++){
                             input = din.read();
-                            for (uint_16 j = 0; j < 4; j++) {
+                            for (int j = 0; j < 4; j++) {
                                 tile.data[i].value[weight_index*4+j] = input.value[j];
                                     }
                                 }
@@ -35,6 +36,7 @@ public:
                             dout.write(tile);
                         }
                     }
+
                 }
             }
         };
@@ -55,13 +57,13 @@ public:
         // Your code starts here
         Params params = paramsIn.read();
 
-        for (uint_16 oy1 = 0; oy1 < params.OY1; oy1++){
-            for (uint_16 ox1 = 0; ox1 < params.OX1; ox1++){
-                for (uint_16 oc1 = 0; oc1 < params.OC1; oc1++){
+        for (int oy1 = 0; oy1 < params.OY1; oy1++){
+            for (int ox1 = 0; ox1 < params.OX1; ox1++){
+                for (int oc1 = 0; oc1 < params.OC1; oc1++){
                     
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> tmp = din.read();
-                    uint_16 numberofWeightsPerTile = params.IC1 * IC0 * (params.FX) * (params.FY);
-                    for (uint_16 i = 0; i < numberofWeightsPerTile; i++){
+                    int numberofWeightsPerTile = int(params.IC1) * IC0 * int(params.FX) * int(params.FY);
+                    for (int i = 0; i < numberofWeightsPerTile; i++){
                         dout.write(tmp.data[i]);
                             }
                         }
