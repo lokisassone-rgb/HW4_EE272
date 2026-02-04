@@ -68,7 +68,7 @@ public:
                     for (int ic1 = 0; ic1 < params.IC1; ic1++){
                         for (int fy = 0; fy < params.FY; fy++){
                             for (int fx = 0; fx < params.FX; fx++){
-                                int buffer_add = ic1 * (params.FY * params.FX) + fy * params.FX + fx; //calculate address linearly
+                                int buffer_add = ic1 * (int(params.FY) * int(params.FX)) + fy * int(params.FX) + fx; //calculate address linearly
                                 for (int oc0_block = 0; oc0_block < OC0/4; oc0_block++){
                                     dout.write( temp.data[buffer_add * (OC0/4) + oc0_block] );
                                 }
