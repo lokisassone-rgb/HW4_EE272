@@ -30,7 +30,6 @@ public:
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite_prev;
 
         for (int i=0; i < numberofTiles; i++){
-            printf("[DEBUG] Tile i=%d\n", i);
             for (int j=0; j < sizeofDoubleBuffer; j++){
                 for (int idx = 0; idx < IC0; idx++) {
                     tempdinwrite.value[idx] = 0;
@@ -46,15 +45,6 @@ public:
                 temp.data[j] = tempdinwrite;
             }
             
-            // Print temp.data before writing
-
-            printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
-            for (int jj=0; jj<sizeofDoubleBuffer; jj++) {
-                printf("  j=%d: ", jj);
-                for (int v=0; v<IC0; v++) printf("%d ", (int)temp.data[jj].value[v]);
-                printf("\n");
-            }
-
             dout.write(temp);
         }
         // Your code ends here
@@ -75,24 +65,24 @@ public:
         // -------------------------------
         // Your code starts here
         Params params = paramsIn.read();
-        int ix0 = (params.OX0 -1 )*params.STRIDE + params.FX;
-        int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
+        int ix0 = (params.OX0 -1 )*params.STRIDE + params.FX; //calculate input width
+        int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY; //calculate input height
+        int numberofTiles = params.OX1 * params.OY1;
 
-        chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
+        chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp; //initialize tile struct
 
-        for (int oy1 = 0; oy1 < params.OY1; oy1++){
-            for (int ox1 = 0; ox1 < params.OX1; ox1++){
-                temp = din.read();
+        for (int i = 0; i < numberofTiles; i++){ //read in inputs in same input tiling as mentioned in review session week 3
+                temp = din.read(); //create new tile 
                 for (int oc1 = 0; oc1 < params.OC1; oc1++){
                     for (int ic1 = 0; ic1 < params.IC1; ic1++){
                         for (int fy = 0; fy < params.FY; fy++){
                             for (int fx = 0; fx < params.FX; fx++){
                                 for (int oy0 = 0; oy0 < params.OY0; oy0++){
-                                    for (int ox0 = 0; ox0 < params.OX0; ox0++){
+                                    for (int ox0 = 0; ox0 < params.OX0; ox0++){ //skip IC0 as unrolled in inputs
                                         int iy = oy0 * params.STRIDE + fy;
                                         int ix = ox0 * params.STRIDE + fx;
-                                        int buffer_idx = ic1 * (iy0 * ix0) + iy * ix0 + ix;
-                                        dout.write(temp.data[buffer_idx]);
+                                        int buffer_add = ic1 * (iy0 * ix0) + iy * ix0 + ix; //calculate address linearly
+                                        dout.write(temp.data[buffer_add]);
                                     }
                                 }
                             }
