@@ -1,7 +1,6 @@
 #ifndef INPUT_DOUBLE_BUFFER_H
 #define INPUT_DOUBLE_BUFFER_H
 
-
 template <int size, int IC0, int OC0>
 class InputDoubleBufferWriter{
 public:
@@ -48,14 +47,14 @@ public:
             }
             
             // Print temp.data before writing
-            /*
+
             printf("[DEBUG] temp.data before dout.write for tile %d:\n", i);
             for (int jj=0; jj<sizeofDoubleBuffer; jj++) {
                 printf("  j=%d: ", jj);
                 for (int v=0; v<IC0; v++) printf("%d ", (int)temp.data[jj].value[v]);
                 printf("\n");
             }
-            */
+
             dout.write(temp);
         }
         // Your code ends here
@@ -139,3 +138,5 @@ private:
 };
 
 #endif
+
+
