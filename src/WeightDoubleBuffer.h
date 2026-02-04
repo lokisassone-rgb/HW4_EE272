@@ -36,8 +36,8 @@ public:
                             }
                         }
                     }
+                    dout.write(temp);
                 }
-                dout.write(temp);
             }
         }
 
