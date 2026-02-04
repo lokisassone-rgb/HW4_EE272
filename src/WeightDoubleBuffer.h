@@ -20,7 +20,7 @@ public:
             for (int ox1 = 0; ox1 < params.OX1; ox1++){
                 for (int oc1 = 0; oc1 < params.OC1; oc1++){
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp;
-                    for (int ic1 = 0; ic1 < params.IC1; ic1++){
+                    for (int ic1 = 0; ic1 < int(params.IC1)*IC0; ic1++){
                         for (int fy = 0; fy < params.FY; fy++){
                             for (int fx = 0; fx < params.FX; fx++){
                                 int buffer_add = ic1 * (int(params.FY) * int(params.FX)) + fy * int(params.FX) + fx; //calculate address linearly
