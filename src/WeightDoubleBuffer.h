@@ -21,14 +21,14 @@ public:
                 for (int oc1 = 0; oc1 < params.OC1; oc1++){
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> tile;
                     PackedInt<WEIGHT_PRECISION, 4> input;
+                
                     //define size of a weight tile (IC1*IC0*FX*FY)
-                    for (int ic = 0; ic < (params.IC1*IC0); ic++){
-                        for (int fy = 0; fy < params.FY; fy++){
-                            for (int fx = 0; fx < params.FX; fx++){
-                                for (int weight_index = 0; weight_index < OC0/4; weight_index++){
-                                    input = din.read();
-                                    for (int j = 0; j < 4; j++) {
-                                        tile.data[ic*int(params.FY)*int(params.FX) + fy*int(params.FX) + fx].value[weight_index*4+j] = input.value[j];
+                    int numberofWeightsPerTile = int(params.IC1) * IC0 * int(params.FX) * int(params.FY);
+                    for (int i = 0; i < numberofWeightsPerTile; i++) {
+                        for (int weight_index = 0; weight_index < OC0/4; weight_index++){
+                            input = din.read();
+                            for (int j = 0; j < 4; j++) {
+                                tile.data[i].value[weight_index*4+j] = input.value[j];
                                     }
                                 }
                             }
@@ -37,11 +37,9 @@ public:
                     dout.write(tile);
                 }
             }
-        }
+        };
         // Your code ends here
         // -------------------------------
-    }
-};
 
 template <int size, int IC0, int OC0>
 class WeightDoubleBufferReader{
@@ -60,23 +58,19 @@ public:
         for (int oy1 = 0; oy1 < params.OY1; oy1++){
             for (int ox1 = 0; ox1 < params.OX1; ox1++){
                 for (int oc1 = 0; oc1 < params.OC1; oc1++){
+                    
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> tmp = din.read();
-                    PackedInt<WEIGHT_PRECISION, OC0> weights_going_to_systolic_array;
-                    for (int ic = 0; ic < (params.IC1*IC0); ic++){
-                        for (int fy = 0; fy < params.FY; fy++){
-                            for (int fx = 0; fx < params.FX; fx++){
-                                weights_going_to_systolic_array = tmp.data[ic*int(params.FY)*int(params.FX) + fy*int(params.FX) + fx];
-                                dout.write(weights_going_to_systolic_array);
+                    int numberofWeightsPerTile = int(params.IC1) * IC0 * int(params.FX) * int(params.FY);
+                    for (int i = 0; i < numberofWeightsPerTile; i++){
+                        dout.write(weights_going_to_systolic_array);
                             }
                         }
                     }
                 }
             }
-        }
+        };
         // Your code ends here
         // -------------------------------
-    }
-};
 
 template <int size, int IC0, int OC0>
 class WeightDoubleBuffer{
