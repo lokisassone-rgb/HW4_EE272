@@ -71,7 +71,8 @@ public:
 
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp; //initialize tile struct
 
-        for (int i = 0; i < numberofTiles; i++){ //read in inputs in same input tiling as mentioned in review session week 3
+        for (int oy1 = 0; oy1 < params.OY1; oy1++){ //read in inputs in same input tiling as mentioned in review session week 3
+            for (int ox1 = 0; ox1 < params.OX1; ox1++){
                 temp = din.read(); //create new tile 
                 for (int oc1 = 0; oc1 < params.OC1; oc1++){
                     for (int ic1 = 0; ic1 < params.IC1; ic1++){
