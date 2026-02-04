@@ -22,24 +22,30 @@ public:
                 for (int oc1 = 0; oc1 < params.OC1; oc1++){
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> tile;
                     PackedInt<WEIGHT_PRECISION, 4> input;
-                
                     //define size of a weight tile (IC1*IC0*FX*FY)
                     int numberofWeightsPerTile = int(params.IC1) * IC0 * int(params.FX) * int(params.FY);
                     for (int i = 0; i < numberofWeightsPerTile; i++) {
                         for (int weight_index = 0; weight_index < OC0/4; weight_index++){
+                            // Prevent input underflow: check if din is empty (if supported)
+                            #ifdef __SYNTHESIS__
+                            // In synthesis, .available() may not be supported, so just read
                             input = din.read();
+                            #else
+                            if (!din.available(1)) {
+                                printf("ERROR: Not enough input data in din channel at i=%d, weight_index=%d\n", i, weight_index);
+                                return;
+                            }
+                            input = din.read();
+                            #endif
                             for (int j = 0; j < 4; j++) {
                                 tile.data[i].value[weight_index*4+j] = input.value[j];
-                                    }
-                                }
                             }
-                            dout.write(tile);
                         }
                     }
-
+                    dout.write(tile);
                 }
             }
-        };
+        }
         // Your code ends here
         // -------------------------------
 
