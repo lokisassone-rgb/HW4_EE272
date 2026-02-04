@@ -14,31 +14,31 @@ public:
     {
         // -------------------------------
         // Your code starts here
-        Params params = paramsIn.read();
 
-        for (uint_16 oy1 = 0; oy1 < params.OY1; oy1++){
-            for (uint_16 ox1 = 0; ox1 < params.OX1; ox1++){
-                for (uint_16 oc1 = 0; oc1 < params.OC1; oc1++){
+        Params params = paramsIn.read(); // read params
+
+        for (uint_16 oy1_idx = 0; oy1_idx < params.OY1; oy1_idx++) {
+            for (uint_16 ox1_idx = 0; ox1_idx < params.OX1; ox1_idx++) {
+                for (uint_16 oc1_idx = 0; oc1_idx < params.OC1; oc1_idx++) {
+
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> tile;
-                    PackedInt<WEIGHT_PRECISION, 4> input;
-                    //define size of a weight tile (IC1*IC0*FX*FY)
-                    for (uint_16 ic = 0; ic < (params.IC1*IC0); ic++){
-                        for (uint_16 fy = 0; fy < params.FY; fy++){
-                            for (uint_16 fx = 0; fx < params.FX; fx++){
-                                for (uint_16 weight_index = 0; weight_index < OC0/4; weight_index++){
-                                    input = din.read();
-                                    for (uint_16 j = 0; j < 4; j++){
-                                        tile.data[ic*(params.FY)*(params.FX) + fy*(params.FX) + fx].value[weight_index*4+j] = input.value[j];
-                                    }
-                                }
-                  
+                    PackedInt<WEIGHT_PRECISION, 4> inputItem;
+
+                    uint_16 numTileItems = params.IC1 * params.FY * params.FX * IC0;
+                    for (int tileItemIdx = 0; tileItemIdx < numTileItems; tileItemIdx++) {
+                        for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) { // assume OC0 is a power of two >= 4
+                            inputItem = din.read(); // read next 4-packed input item
+                            for (int i = 0; i < 4; i++) {
+                                tile.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
                             }
                         }
                     }
-                    dout.write(tile);
+
+                    dout.write(tile); // write tile (infers double buffer)
                 }
             }
         }
+
         // Your code ends here
         // -------------------------------
     }
@@ -56,25 +56,22 @@ public:
     {
         // -------------------------------
         // Your code starts here
-        Params params = paramsIn.read();
 
-        for (uint_16 oy1 = 0; oy1 < params.OY1; oy1++){
-            for (uint_16 ox1 = 0; ox1 < params.OX1; ox1++){
-                for (uint_16 oc1 = 0; oc1 < params.OC1; oc1++){
-                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> tmp = din.read();
-                    PackedInt<WEIGHT_PRECISION, OC0> weights_going_to_systolic_array;
-                    for (uint_16 ic = 0; ic < (params.IC1*IC0); ic++){
-                        for (uint_16 fy = 0; fy < params.FY; fy++){
-                            for (uint_16 fx = 0; fx < params.FX; fx++){
-                                weights_going_to_systolic_array = tmp.data[ic*(params.FY)*(params.FX) + fy*(params.FX) + fx];
-                                dout.write(weights_going_to_systolic_array);
-                            }
-                        }
+        Params params = paramsIn.read(); // read params
+
+        for (uint_16 oy1_idx = 0; oy1_idx < params.OY1; oy1_idx++) {
+            for (uint_16 ox1_idx = 0; ox1_idx < params.OX1; ox1_idx++) {
+                for (uint_16 oc1_idx = 0; oc1_idx < params.OC1; oc1_idx++) {
+
+                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> tile = din.read(); // read tile (infers double buffer)
+
+                    uint_16 numTileItems = params.IC1 * params.FY * params.FX * IC0;
+                    for (int adr = 0; adr < numTileItems; adr++) {
+                        dout.write(tile.data[adr]); // write weights in sequential order for the systolic array to digest
                     }
                 }
             }
         }
-
 
         // Your code ends here
         // -------------------------------
