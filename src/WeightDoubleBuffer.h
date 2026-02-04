@@ -3,7 +3,6 @@
 
 
 template <int size, int IC0, int OC0>
-printf("size = %d\n", size);
 class WeightDoubleBufferWriter{
 public:
     WeightDoubleBufferWriter(){}
@@ -15,6 +14,7 @@ public:
     {
         // -------------------------------
         // Your code starts here
+        printf("size = %d\n", size);
         Params params = paramsIn.read();
 
         for (int oy1 = 0; oy1 < params.OY1; oy1++){
