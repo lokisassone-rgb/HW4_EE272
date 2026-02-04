@@ -62,7 +62,7 @@ public:
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> tmp = din.read();
                     int numberofWeightsPerTile = int(params.IC1) * IC0 * int(params.FX) * int(params.FY);
                     for (int i = 0; i < numberofWeightsPerTile; i++){
-                        dout.write(weights_going_to_systolic_array);
+                        dout.write(tmp.data[i]);
                             }
                         }
                     }
