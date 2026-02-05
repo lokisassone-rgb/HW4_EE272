@@ -124,7 +124,7 @@ public:
             // The number of steps in a run of the systolic array is equal to:
             // the ramp-up time + number of pixels + flush time
             // Your code starts here
-            int steps_in_run = params.OY0*params.OX0 + ICO - 1 + OC0 - 1;
+            int steps_in_run = params.OY0*params.OX0 + IC0 - 1 + OC0 - 1;
 
             for (z = 0; z < steps_in_run; z++) {
             // Your code ends here 
@@ -265,13 +265,13 @@ public:
                 // After a certain number of cycles, you will have valid output from the systolic array
                 // Depending on the loop indices, this valid output will either be written into the accumulation buffer or written out
                 // Your code starts here
-                if (step >= ICO + OC0 - 2){
+                if (step >= IC0 + OC0 - 2){
                     if ((loopIndex.ic1_idx == params.IC1-1) && 
                         (loopIndex.fx_idx == params.FX-1) && 
                         (loopIndex.fy_idx == params.FY-1)) {
                         output.write(output_row);
                     } else {
-                        accumulation_buffer.value[step - (ICO + OC0 - 2)] = output_row;
+                        accumulation_buffer.value[step - (IC0 + OC0 - 2)] = output_row;
                         }
                     }
                 }
