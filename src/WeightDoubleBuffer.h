@@ -15,30 +15,25 @@ public:
         // -------------------------------
         // Your code starts here
         Params params = paramsIn.read();
-        int numberofTiles = params.OX1 * params.OY1;
-        int sizeofDoubleBuffer = params.FX * params.FY * params.IC1;
-
-        chanStruct<PackedInt<WEIGHT_PRECISION,OC0>,size> temp;
-        PackedInt<WEIGHT_PRECISION, 4> tempdinread;
-        PackedInt<WEIGHT_PRECISION, OC0> tempdinwrite;
+        int numberofTiles = params.OX1 * params.OY1 * params.OC1;
+        int sizeofDoubleBuffer = params.FX * params.FY * params.IC1 * IC0;
         
+        chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> temp;
+        PackedInt<WEIGHT_PRECISION, 4> tempdinread;
+
         for (int i = 0; i < numberofTiles; i++){
             for (int j = 0; j < sizeofDoubleBuffer; j++){
-                for (int idx = 0; idx < OC0; idx++) {
-                    tempdinwrite.value[idx] = 0;
-                }
-                for (int k = 0; k<OC0/4; k++){
+                for (int k = 0; k < OC0/4; k++){
                     tempdinread = din.read();
-                    tempdinwrite.value[k*4] = tempdinread.value[0];
-                    tempdinwrite.value[k*4+1] = tempdinread.value[1];
-                    tempdinwrite.value[k*4+2] = tempdinread.value[2];
-                    tempdinwrite.value[k*4+3] = tempdinread.value[3];
+                    temp.data[j].value[k*4] = tempdinread.value[0];
+                    temp.data[j].value[k*4+1] = tempdinread.value[1];
+                    temp.data[j].value[k*4+2] = tempdinread.value[2];
+                    temp.data[j].value[k*4+3] = tempdinread.value[3];
                 }
-                temp.data[j] = tempdinwrite;
             }
             dout.write(temp);
         }
-    }
+
 };
         // Your code ends here
         // -------------------------------
