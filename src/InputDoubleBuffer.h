@@ -19,15 +19,10 @@ public:
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
         int sizeofDoubleBuffer = ix0*iy0*params.IC1;
 
-        printf("[DEBUG] Params: OX1=%d, OY1=%d, OX0=%d, OY0=%d, FX=%d, FY=%d, STRIDE=%d, IC1=%d\n", 
-               (int)params.OX1, (int)params.OY1, (int)params.OX0, (int)params.OY0, 
-               (int)params.FX, (int)params.FY, (int)params.STRIDE, (int)params.IC1);
-        printf("[DEBUG] InputDoubleBufferWriter: numberofTiles=%d, sizeofDoubleBuffer=%d\n", numberofTiles, sizeofDoubleBuffer);
 
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
-        PackedInt<INPUT_PRECISION, IC0> tempdinwrite_prev;
 
         for (int i=0; i < numberofTiles; i++){
             for (int j=0; j < sizeofDoubleBuffer; j++){

@@ -14,32 +14,34 @@ public:
     {
         // -------------------------------
         // Your code starts here
-        printf("size = %d\n", size);
         Params params = paramsIn.read();
+        int numberofTiles = params.OX1 * params.OY1;
+        int ix0 = (params.OX0 -1 )*params.STRIDE + params.FX;
+        int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
+        int sizeofDoubleBuffer = ix0 * iy0 * params.IC1;
 
-        for (int oy1 = 0; oy1 < params.OY1; oy1++){
-            for (int ox1 = 0; ox1 < params.OX1; ox1++){
-                for (int oc1 = 0; oc1 < params.OC1; oc1++){
-                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> tile;
-                    PackedInt<WEIGHT_PRECISION, 4> input;
-                
-                    //define size of a weight tile (IC1*IC0*FX*FY)
-                    int numberofWeightsPerTile = int(params.IC1) * IC0 * int(params.FX) * int(params.FY);
-                    for (int i = 0; i < numberofWeightsPerTile; i++) {
-                        for (int weight_index = 0; weight_index < OC0/4; weight_index++){
-                            input = din.read();
-                            for (int j = 0; j < 4; j++) {
-                                tile.data[i].value[weight_index*4+j] = input.value[j];
-                                    }
-                                }
-                            }
-                            dout.write(tile);
-                        }
-                    }
+        chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
+        PackedInt<INPUT_PRECISION, 4> tempdinread;
+        PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
 
+        for (int i = 0; i < numberofTiles; i++){
+            for (int j = 0; j < sizeofDoubleBuffer; j++){
+                for (int idx = 0; idx < OC0; idx++) {
+                    tempdinwrite.value[idx] = 0;
                 }
+                for (int k = 0; k<OC0/4; k++){
+                    tempdinread = din.read();
+                    tempdinwrite.value[k*4] = tempdinread.value[0];
+                    tempdinwrite.value[k*4+1] = tempdinread.value[1];
+                    tempdinwrite.value[k*4+2] = tempdinread.value[2];
+                    tempdinwrite.value[k*4+3] = tempdinread.value[3];
+                }
+                temp.data[j] = tempdinwrite;
             }
-        };
+            dout.write(temp);
+        }
+    };
+}
         // Your code ends here
         // -------------------------------
 
