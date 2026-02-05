@@ -24,7 +24,7 @@ void run(ac_channel<Params> &paramsIn,
         // Write the loop indices as well as the params out to channels.
         // Your code starts here
         Params params = paramsIn.read();
-        for (int i=0; i < params.OY1; i++){}//loop through conv gold tb same way conv loop
+        for (int i=0; i < params.OY1; i++){//loop through conv gold tb same way conv loop
             for (int j=0; j< params.OX1; j++){
                 for (int k = 0; k < params.OC1; k++) {
                     for (int ic1 = 0; ic1 < params.IC1; ic1++) {
