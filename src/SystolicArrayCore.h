@@ -112,8 +112,8 @@ public:
             // -------------------------------
             // Read in the params and loop indices from the channel
             // Your code starts here
-            LoopIndices loopIndex = loopIndicesIn.read(); 
             Params params = paramsIn.read();
+            LoopIndices loopIndex = loopIndicesIn.read(); 
 
             // Your code ends here
             // -------------------------------
@@ -126,7 +126,7 @@ public:
             // Your code starts here
             int steps_in_run = params.OY0*params.OX0 + IC0 - 1 + OC0 - 1;
 
-            for (z = 0; z < steps_in_run; z++) {
+            for (int z = 0; z < steps_in_run; z++) {
             // Your code ends here 
             // You should now be in the body of the loop
             // -------------------------------
@@ -135,7 +135,7 @@ public:
                 // If you are in the ramp up time, read in weights from the channel
                 // and store it in the weights array
                 // Your code starts here
-                if ( z < (IC0)) {
+                if (z < (IC0)) {
                     weight_reg.value[z] = weight.read(); //read in weights and store in weights array
                 }
                 // Your code ends here
@@ -185,12 +185,14 @@ public:
                 // Set partial outputs for the array to psum_buf.
                 // Depending on the loop index, the partial output will be 0 or a value from the accumulation buffer
                 // Your code starts here
-                 if ((loopIndex.ic1_idx == 0 && loopIndex.fx_idx == 0 && loopIndex.fy_idx == 0)) { //when set to 0 for a new pixel
+                 if ((loopIndex.ic1_idx == 0 && 
+                    loopIndex.fx_idx == 0 && 
+                    loopIndex.fy_idx == 0)) { //when set to 0 for a new pixel
                         for (int m = 0; m < OC0; m++) {
                             psum_buf.value[m] = 0;
                         }
                     } 
-                 else (z < params.OY0*params.OX0) { //accumulate as we approach buffer tile size
+                 else if (z < params.OY0*params.OX0) { //accumulate as we approach buffer tile size
                         psum_buf = accumulation_buffer.value[z];
                     }
                 // Your code ends here
@@ -283,10 +285,10 @@ public:
                 // That is, the outputs that a PE wrote to should now become the input for the next PE
                 // Your code starts here
                 for (int i = 0; i < IC0 -1; i++){
-                    input_reg.value[i] = ifmap_out.value[i];
+                    input_reg.value[i+1] = ifmap_out.value[i];
                 }
                 for (int i = 0; i < OC0 - 1; i++){
-                    ofmap_in.value[i] = psum_reg.value[i];
+                    ofmap_in.value[i+1] = psum_reg.value[i];
                 }
                 // Your code ends here
                 // -------------------------------
