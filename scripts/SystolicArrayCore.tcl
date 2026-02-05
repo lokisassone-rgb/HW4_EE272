@@ -10,11 +10,11 @@ go compile
 
 source scripts/set_libraries.tcl
 
-solution library add {[CCORE] ProcessingElement<IDTYPE,ODTYPE>.v1}
+solution library add {[CCORE] ProcessingElement<IDTYPE,WDTYPE,ODTYPE>.v1}
 
 go libraries
 directive set -CLOCKS $clocks
-directive set /SystolicArrayCore<IDTYPE,WDTYPE,ODTYPE,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/ProcessingElement<IDTYPE,ODTYPE> -MAP_TO_MODULE {[CCORE] ProcessingElement<IDTYPE,ODTYPE>.v1}
+directive set /SystolicArrayCore<IDTYPE,WDTYPE,ODTYPE,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/ProcessingElement<IDTYPE,WDTYPE,ODTYPE> -MAP_TO_MODULE {[CCORE] ProcessingElement<IDTYPE,WDTYPE,ODTYPE>.v1}
 
 go assembly
 
