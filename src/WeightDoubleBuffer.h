@@ -16,14 +16,12 @@ public:
         // Your code starts here
         Params params = paramsIn.read();
         int numberofTiles = params.OX1 * params.OY1;
-        int ix0 = (params.OX0 -1 )*params.STRIDE + params.FX;
-        int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
-        int sizeofDoubleBuffer = ix0 * iy0 * params.IC1;
+        int sizeofDoubleBuffer = params.FX * params.FY * params.IC1;
 
-        chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
-        PackedInt<INPUT_PRECISION, 4> tempdinread;
-        PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
-
+        chanStruct<PackedInt<WEIGHT_PRECISION,OC0>,size> temp;
+        PackedInt<WEIGHT_PRECISION, 4> tempdinread;
+        PackedInt<WEIGHT_PRECISION, OC0> tempdinwrite;
+        
         for (int i = 0; i < numberofTiles; i++){
             for (int j = 0; j < sizeofDoubleBuffer; j++){
                 for (int idx = 0; idx < OC0; idx++) {
