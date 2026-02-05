@@ -34,6 +34,7 @@ public:
             dout.write(temp);
         }
 
+    }
 };
         // Your code ends here
         // -------------------------------
@@ -51,23 +52,25 @@ public:
         // -------------------------------
         // Your code starts here
         Params params = paramsIn.read();
+        int numberofTiles = params.OX1 * params.OY1 * params.OC1;
+        int sizeofDoubleBuffer = params.FX * params.FY * params.IC1 * IC0;
 
-        for (int oy1 = 0; oy1 < params.OY1; oy1++){
-            for (int ox1 = 0; ox1 < params.OX1; ox1++){
-                for (int oc1 = 0; oc1 < params.OC1; oc1++){
-                    
-                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> tmp = din.read();
-                    int numberofWeightsPerTile = int(params.IC1) * IC0 * int(params.FX) * int(params.FY);
-                    for (int i = 0; i < numberofWeightsPerTile; i++){
-                        dout.write(tmp.data[i]);
-                            }
-                        }
-                    }
-                }
+        chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> temp;
+        PackedInt<WEIGHT_PRECISION, OC0> tempdoutwrite;
+
+
+        for (int i = 0; i < numberofTiles; i++){
+            temp = din.read();
+            for (int j = 0; j < sizeofDoubleBuffer; j++){
+                tempdoutwrite = temp.data[j];
+                dout.write (tempdoutwrite);
             }
-        };
+        }
+    }
+};
         // Your code ends here
         // -------------------------------
+
 
 template <int size, int IC0, int OC0>
 class WeightDoubleBuffer{
