@@ -126,7 +126,7 @@ public:
             // Your code starts here
             int steps_in_run = params.OY0*params.OX0 + IC0 - 1 + OC0 - 1;
 
-            for (int z = 0; z < steps_in_run; z++) {
+            for (int z = 0; z < steps_in_run; z++){
             // Your code ends here 
             // You should now be in the body of the loop
             // -------------------------------
@@ -276,7 +276,6 @@ public:
                         accumulation_buffer.value[step - (IC0 + OC0 - 2)] = output_row;
                         }
                     }
-                }
                 // Your code ends here
                 // -------------------------------
                 
@@ -298,7 +297,7 @@ public:
     
         // Debug example:
         // printf("outputs written: %d\n", output.size());
-    }
+    };
 
 private:
     
