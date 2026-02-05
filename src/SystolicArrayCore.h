@@ -125,8 +125,8 @@ public:
             // the ramp-up time + number of pixels + flush time
             // Your code starts here
             int steps_in_run = params.OY0*params.OX0 + IC0 - 1 + OC0 - 1;
-            int step=0;
-            for (int step = 0; step < steps_in_run; z++){
+
+            for (int z = 0; z < steps_in_run; z++){
             // Your code ends here 
             // You should now be in the body of the loop
             // -------------------------------
@@ -135,8 +135,8 @@ public:
                 // If you are in the ramp up time, read in weights from the channel
                 // and store it in the weights array
                 // Your code starts here
-                if (step < (IC0)) {
-                    weight_reg.value[step] = weight.read(); //read in weights and store in weights array
+                if (z < (IC0)) {
+                    weight_reg.value[z] = weight.read(); //read in weights and store in weights array
                 }
                 // Your code ends here
                 // -------------------------------
@@ -148,7 +148,7 @@ public:
                 // Read inputs from the channel and store in the variable in_col
                 // Note: you don't read in any inputs during the flush time
                 // Your code starts here
-                 if (step < params.OY0*params.OX0) { //sotre inputs from channel
+                 if (z < params.OY0*params.OX0) { //sotre inputs from channel
                     in_col = input.read();
                 }
                 // Your code ends here
@@ -170,7 +170,7 @@ public:
                     BOOST_PP_CAT(input_fifo_, i).run( BOOST_PP_CAT(input_fifo_input_, i) , BOOST_PP_CAT(input_fifo_output_, i) ); \
                     input_buf.value[i] = BOOST_PP_CAT(input_fifo_output_, i);
                 
-                BOOST_PP_REPEAT(IC0, INPUT_FIFO_BODY, unused)
+                REPEAT(INPUT_FIFO_BODY)
 
                 // -------------------------------
                 // Assign values from input_buf into the registers for the first column of PEs
@@ -192,7 +192,7 @@ public:
                             psum_buf.value[m] = 0;
                         }
                     } 
-                 else if (step < params.OY0*params.OX0) { //accumulate as we approach buffer tile size
+                 else if (z < params.OY0*params.OX0) { //accumulate as we approach buffer tile size
                         psum_buf = accumulation_buffer.value[z];
                     }
                 // Your code ends here
@@ -212,7 +212,7 @@ public:
                     BOOST_PP_CAT(psum_fifo_, i).run( BOOST_PP_CAT(psum_fifo_input_, i) , BOOST_PP_CAT(psum_fifo_output_, i) ); \
                     output_buf.value[i] = BOOST_PP_CAT(psum_fifo_output_, i);
                 
-                BOOST_PP_REPEAT(IC0, ACCUM_FIFO_BODY, unused)
+                REPEAT(ACCUM_FIFO_BODY)
         
                 // -------------------------------
                 // Assign values from output_buf into the partial sum registers for the first row of PEs
@@ -261,7 +261,7 @@ public:
                     BOOST_PP_CAT(accum_fifo_, i).run( psum_reg[IC0][i] , BOOST_PP_CAT(accum_fifo_output_, i) );\
                     output_row.value[i] = BOOST_PP_CAT(accum_fifo_output_,i); \
                 
-                BOOST_PP_REPEAT(OC0, FIFO_WRITE_BODY_NEW, unused)
+                REPEAT(FIFO_WRITE_BODY_NEW)
 
                 // -------------------------------
                 // After a certain number of cycles, you will have valid output from the systolic array
@@ -323,18 +323,18 @@ private:
 #define INPUT_FIFOS_INIT(z, i, unused) \
     Fifo<IDTYPE, i + 1> BOOST_PP_CAT(input_fifo_, i);
 
-    BOOST_PP_REPEAT(IC0, INPUT_FIFOS_INIT, unused)
+    REPEAT(INPUT_FIFOS_INIT)
 
 #define ACCUM_FIFOS_INIT(z, i, unused) \
     Fifo<ODTYPE, i + 1> BOOST_PP_CAT(psum_fifo_, i);
 
-    BOOST_PP_REPEAT(IC0, ACCUM_FIFOS_INIT, unused)
+    REPEAT(ACCUM_FIFOS_INIT)
     
 
 #define OUTPUT_FIFOS_INIT(z, i, unused) \
     Fifo<ODTYPE, OC0 - i> BOOST_PP_CAT(accum_fifo_, i);
     
-    BOOST_PP_REPEAT(OC0, OUTPUT_FIFOS_INIT, unused)
+    REPEAT(OUTPUT_FIFOS_INIT)
 };
 
 #endif
