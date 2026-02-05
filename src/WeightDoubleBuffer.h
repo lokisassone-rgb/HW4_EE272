@@ -40,8 +40,8 @@ public:
             }
             dout.write(temp);
         }
-    };
-}
+    }
+};
         // Your code ends here
         // -------------------------------
 
