@@ -23,10 +23,27 @@ void run(ac_channel<Params> &paramsIn,
         // Generate the loop indices here for the systolic array.
         // Write the loop indices as well as the params out to channels.
         // Your code starts here
-
+        Params params = paramsIn.read();
+        for (int i=0; i < params.OY1; i++){}//loop through conv gold tb same way conv loop
+            for (int j=0; j< params.OX1; j++){
+                for (int k = 0; k < params.OC1; k++) {
+                    for (int ic1 = 0; ic1 < params.IC1; ic1++) {
+                        for (int fy = 0; fy < params.FY; fy++) {
+                            for (int fx = 0; fx < params.FX; fx++) {
+                                paramsOut.write(params);//write out params
+                                LoopIndices loopindex; //instansiate LoopIndixes to write out
+                                loopindex.ic1_idx = ic1;
+                                loopindex.fx_idx = fx;
+                                loopindex.fy_idx = fy;
+                                loopIndicesOut.write(loopindex);
+                            }
+                        }
+                    }
+                }
+            }
         // Your code ends here
         // -------------------------------
-    }
+    }   }
 };
 
 template <typename IDTYPE, typename WDTYPE, typename ODTYPE, int OC0, int IC0>
