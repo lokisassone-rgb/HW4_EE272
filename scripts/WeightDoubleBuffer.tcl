@@ -18,7 +18,8 @@ go assembly
 # -------------------------------
 # Set the correct word widths and the stage replication
 # Your code starts here
-
+directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/mem:cns -STAGE_REPLICATION 2
+directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/mem -WORD_WIDTH 128
 # Your code ends here
 # -------------------------------
 
