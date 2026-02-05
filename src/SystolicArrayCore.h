@@ -112,6 +112,8 @@ public:
             // -------------------------------
             // Read in the params and loop indices from the channel
             // Your code starts here
+            LoopIndices loopIndex = loopIndicesIn.read(); 
+            Params params = paramsIn.read();
 
             // Your code ends here
             // -------------------------------
@@ -122,7 +124,9 @@ public:
             // The number of steps in a run of the systolic array is equal to:
             // the ramp-up time + number of pixels + flush time
             // Your code starts here
+            int steps_in_run = params.OY0*params.OX0 + ICO - 1 + OC0 - 1;
 
+            for (z = 0; z < steps_in_run; z++) {
             // Your code ends here 
             // You should now be in the body of the loop
             // -------------------------------
@@ -131,7 +135,9 @@ public:
                 // If you are in the ramp up time, read in weights from the channel
                 // and store it in the weights array
                 // Your code starts here
-
+                if ( z < (IC0)) {
+                    weight_reg.value[z] = weight.read(); //read in weights and store in weights array
+                }
                 // Your code ends here
                 // -------------------------------
                 
@@ -142,7 +148,9 @@ public:
                 // Read inputs from the channel and store in the variable in_col
                 // Note: you don't read in any inputs during the flush time
                 // Your code starts here
-
+                 if (z < params.OY0*params.OX0) { //sotre inputs from channel
+                    in_col = input.read();
+                }
                 // Your code ends here
                 // -------------------------------
 
@@ -167,7 +175,7 @@ public:
                 // -------------------------------
                 // Assign values from input_buf into the registers for the first column of PEs
                 // Your code starts here
-
+                ifmap_in.value[0] = input_buf;
                 // Your code ends here
                 // -------------------------------
 
@@ -177,7 +185,14 @@ public:
                 // Set partial outputs for the array to psum_buf.
                 // Depending on the loop index, the partial output will be 0 or a value from the accumulation buffer
                 // Your code starts here
-
+                 if ((loopIndex.ic1_idx == 0 && loopIndex.fx_idx == 0 && loopIndex.fy_idx == 0)) { //when set to 0 for a new pixel
+                        for (int m = 0; m < OC0; m++) {
+                            psum_buf.value[m] = 0;
+                        }
+                    } 
+                 else (z < params.OY0*params.OX0) { //accumulate as we approach buffer tile size
+                        psum_buf = accumulation_buffer.value[z];
+                    }
                 // Your code ends here
                 // -------------------------------
                 
@@ -200,7 +215,7 @@ public:
                 // -------------------------------
                 // Assign values from output_buf into the partial sum registers for the first row of PEs
                 // Your code starts here
-
+                    ofmap_in.value[0] = output_buf;
                 // Your code ends here
                 // -------------------------------
             
@@ -209,7 +224,17 @@ public:
                 // Run the 16x16 PE array
                 // Make sure that the correct registers are given to the PE
                 // Your code starts here
-
+                for (int i = 0; i < OC0; i++){
+                    for (int j = 0; j < IC0; j++){
+                        pe_array[i][j].run(
+                            input_reg.value[j].value[i],
+                            psum_reg.value[i].value[j],
+                            weight_reg.value[i].value[j],
+                            ifmap_out.value[j].value[i],
+                            ofmap_in.value[i].value[j]
+                        );
+                    }
+                }
                 // Your code ends here
                 // -------------------------------
 
@@ -240,7 +265,16 @@ public:
                 // After a certain number of cycles, you will have valid output from the systolic array
                 // Depending on the loop indices, this valid output will either be written into the accumulation buffer or written out
                 // Your code starts here
-
+                if (step >= ICO + OC0 - 2){
+                    if ((loopIndex.ic1_idx == params.IC1-1) && 
+                        (loopIndex.fx_idx == params.FX-1) && 
+                        (loopIndex.fy_idx == params.FY-1)) {
+                        output.write(output_row);
+                    } else {
+                        accumulation_buffer.value[step - (ICO + OC0 - 2)] = output_row;
+                        }
+                    }
+                }
                 // Your code ends here
                 // -------------------------------
                 
@@ -248,7 +282,12 @@ public:
                 // Cycle the input/psum registers
                 // That is, the outputs that a PE wrote to should now become the input for the next PE
                 // Your code starts here
-
+                for (int i = 0; i < IC0 -1; i++){
+                    input_reg.value[i] = ifmap_out.value[i];
+                }
+                for (int i = 0; i < OC0 - 1; i++){
+                    ofmap_in.value[i] = psum_reg.value[i];
+                }
                 // Your code ends here
                 // -------------------------------
                 if (step == step_bound-1) break;
@@ -269,7 +308,13 @@ private:
     //  - input registers (two sets, one at the input of the PE and one at the output) 
     //  - psum registers (two sets, one at the input of the PE and one at the output) 
     // Your code starts here
-
+    ProcessingElement<IDTYPE, WDTYPE, ODTYPE> pe_array[OC0][IC0];
+    PackedInt2D<WEIGHT_PRECISION, OC0, IC0> weight_reg;
+    PackedInt2D<INPUT_PRECISION, IC0, OC0> input_reg;
+    PackedInt2D<OUTPUT_PRECISION, OC0, ACCUMULATION_BUFFER_SIZE> accumulation_buffer; 
+    PackedInt2D<OUTPUT_PRECISION, OC0, IC0> ofmap_in;
+    PackedInt2D<OUTPUT_PRECISION, IC0, OC0> ifmap_out;
+    PackedInt2D<OUTPUT_PRECISION, OC0, IC0> psum_reg;
     // Your code ends here
     // -------------------------------
     
