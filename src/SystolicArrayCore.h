@@ -170,7 +170,7 @@ public:
                     BOOST_PP_CAT(input_fifo_, i).run( BOOST_PP_CAT(input_fifo_input_, i) , BOOST_PP_CAT(input_fifo_output_, i) ); \
                     input_buf.value[i] = BOOST_PP_CAT(input_fifo_output_, i);
                 
-                REPEAT(INPUT_FIFO_BODY)
+                BOOST_PP_REPEAT(INPUT_FIFO_BODY)
 
                 // -------------------------------
                 // Assign values from input_buf into the registers for the first column of PEs
@@ -212,7 +212,7 @@ public:
                     BOOST_PP_CAT(psum_fifo_, i).run( BOOST_PP_CAT(psum_fifo_input_, i) , BOOST_PP_CAT(psum_fifo_output_, i) ); \
                     output_buf.value[i] = BOOST_PP_CAT(psum_fifo_output_, i);
                 
-                REPEAT(ACCUM_FIFO_BODY)
+                BOOST_PP_REPEAT(ACCUM_FIFO_BODY)
         
                 // -------------------------------
                 // Assign values from output_buf into the partial sum registers for the first row of PEs
@@ -261,7 +261,7 @@ public:
                     BOOST_PP_CAT(accum_fifo_, i).run( psum_reg[IC0][i] , BOOST_PP_CAT(accum_fifo_output_, i) );\
                     output_row.value[i] = BOOST_PP_CAT(accum_fifo_output_,i); \
                 
-                REPEAT(FIFO_WRITE_BODY_NEW)
+                BOOST_PP_REPEAT(FIFO_WRITE_BODY_NEW)
 
                 // -------------------------------
                 // After a certain number of cycles, you will have valid output from the systolic array
@@ -323,18 +323,18 @@ private:
 #define INPUT_FIFOS_INIT(z, i, unused) \
     Fifo<IDTYPE, i + 1> BOOST_PP_CAT(input_fifo_, i);
 
-    REPEAT(INPUT_FIFOS_INIT)
+    BOOST_PP_REPEAT(INPUT_FIFOS_INIT)
 
 #define ACCUM_FIFOS_INIT(z, i, unused) \
     Fifo<ODTYPE, i + 1> BOOST_PP_CAT(psum_fifo_, i);
 
-    REPEAT(ACCUM_FIFOS_INIT)
+    BOOST_PP_REPEAT(ACCUM_FIFOS_INIT)
     
 
 #define OUTPUT_FIFOS_INIT(z, i, unused) \
     Fifo<ODTYPE, OC0 - i> BOOST_PP_CAT(accum_fifo_, i);
     
-    REPEAT(OUTPUT_FIFOS_INIT)
+    BOOST_PP_REPEAT(OUTPUT_FIFOS_INIT)
 };
 
 #endif
