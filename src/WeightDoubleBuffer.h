@@ -16,7 +16,7 @@ public:
         // Your code starts here
         Params params = paramsIn.read();
         int numberofTiles = params.OX1 * params.OY1 * params.OC1;
-        int sizeofDoubleBuffer = params.FX * params.FY * params.IC1 * IC0;
+        int sizeofDoubleBuffer = int(params.FX) * int(params.FY) * int(params.IC1) * IC0;
         
         chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> temp;
         PackedInt<WEIGHT_PRECISION, 4> tempdinread;
@@ -53,7 +53,7 @@ public:
         // Your code starts here
         Params params = paramsIn.read();
         int numberofTiles = params.OX1 * params.OY1 * params.OC1;
-        int sizeofDoubleBuffer = params.FX * params.FY * params.IC1 * IC0;
+        int sizeofDoubleBuffer = int(params.FX) * int(params.FY) * int(params.IC1) * IC0;
 
         chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> temp;
         PackedInt<WEIGHT_PRECISION, OC0> tempdoutwrite;
