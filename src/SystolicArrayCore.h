@@ -126,7 +126,7 @@ public:
             // Your code starts here
             int steps_in_run = params.OY0*params.OX0 + IC0 - 1 + OC0 - 1;
 
-            for (int z = 0; z < steps_in_run; z++){
+            for (int step = 0; step < steps_in_run; step++){
             // Your code ends here 
             // You should now be in the body of the loop
             // -------------------------------
@@ -135,8 +135,8 @@ public:
                 // If you are in the ramp up time, read in weights from the channel
                 // and store it in the weights array
                 // Your code starts here
-                if (z < (IC0)) {
-                    weight_reg.value[z] = weight.read(); //read in weights and store in weights array
+                if (step < (IC0)) {
+                    weight_reg.value[step] = weight.read(); //read in weights and store in weights array
                 }
                 // Your code ends here
                 // -------------------------------
@@ -148,7 +148,7 @@ public:
                 // Read inputs from the channel and store in the variable in_col
                 // Note: you don't read in any inputs during the flush time
                 // Your code starts here
-                 if (z < params.OY0*params.OX0) { //sotre inputs from channel
+                 if (step < params.OY0*params.OX0) { //sotre inputs from channel
                     in_col = input.read();
                 }
                 // Your code ends here
@@ -192,7 +192,7 @@ public:
                             psum_buf.value[m] = 0;
                         }
                     } 
-                 else if (z < params.OY0*params.OX0) { //accumulate as we approach buffer tile size
+                 else if (step < params.OY0*params.OX0) { //accumulate as we approach buffer tile size
                         psum_buf = accumulation_buffer.value[z];
                     }
                 // Your code ends here
