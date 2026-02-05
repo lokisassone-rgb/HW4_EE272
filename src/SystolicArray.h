@@ -43,7 +43,7 @@ void run(ac_channel<Params> &paramsIn,
             }
         // Your code ends here
         // -------------------------------
-    }   }
+    }   
 };
 
 template <typename IDTYPE, typename WDTYPE, typename ODTYPE, int OC0, int IC0>
