@@ -41,6 +41,7 @@ void run(ac_channel<Params> &paramsIn,
                     }
                 }
             }
+        }
         // Your code ends here
         // -------------------------------
     }   
