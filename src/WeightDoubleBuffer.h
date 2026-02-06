@@ -17,11 +17,11 @@ public:
 
         Params params = paramsIn.read(); // read params
 
-        for (int oy1 = 0; oy1 < params.OY1; oy1++) {
+        for (int oy1 = 0; oy1 < params.OY1; oy1++) {//oy and ox number of tiles
             for (int ox1 = 0; ox1 < params.OX1; ox1++) {
                 for (int oc1 = 0; oc1 < params.OC1; oc1++) {
 
-                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp;
+                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp; //create a new tile
                     PackedInt<WEIGHT_PRECISION, 4> inputItem;
 
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
@@ -29,12 +29,12 @@ public:
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
                             inputItem = din.read();
                             for (int i = 0; i < 4; i++) {
-                                temp.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
+                                temp.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i]; //
                             }
                         }
                     }
 
-                    dout.write(temp); // write tile (infers double buffer)
+                    dout.write(temp); 
                 }
             }
         }
@@ -65,9 +65,9 @@ public:
 
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp = din.read();
 
-                    int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
+                    int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0; //number of calculations per pixel
                     for (int adr = 0; adr < numTileItems; adr++) {
-                        dout.write(temp.data[adr]); // write tile item by item (infers double buffer)
+                        dout.write(temp.data[adr]); // write tile item by item into address
                     }
                 }
             }
