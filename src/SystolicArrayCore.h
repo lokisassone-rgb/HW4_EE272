@@ -113,14 +113,14 @@ public:
             // Read in the params and loop indices from the channel
             // Your code starts here
             Params params = paramsIn.read();
-            LoopIndices loopIndices = loopIndicesIn.read();
+            LoopIndices loopIndex = loopIndicesIn.read();
             // Your code ends here
             // -------------------------------
             // int step_bound = params.OY0 * params.OX0 + params.FY + params.FX - 1;//
-            int num_output_tile_entries = params.OY0 * params.OX0;
+            int tile_entries = params.OY0 * params.OX0;
             int ramp_up_time = IC0 - 1;
             int flush = OC0 - 1 ;
-            int step_bound = ramp_up_time + num_output_tile_entries + flush;
+            int step_bound = ramp_up_time + tile_entries + flush;
             int step = 0;
 
             // -------------------------------
@@ -139,7 +139,7 @@ public:
                 // and store it in the weights array
                 // Your code starts here
                 if (step <= ramp_up_time) {
-                    weight_array.value[step] = weight.read();
+                    weight_reg.value[step] = weight.read();
                 }
 
                 // Your code ends here
@@ -152,7 +152,7 @@ public:
                 // Read inputs from the channel and store in the variable in_col
                 // Note: you don't read in any inputs during the flush time
                 // Your code starts here
-                if (step < num_output_tile_entries) {
+                if (step < tile_entries) {
                     in_col = input.read();
                 }
                 // Your code ends here
@@ -181,12 +181,6 @@ public:
                 // Your code starts here
                     ifmap_in.value[0] = input_buf;
 
-                    // if (step < num_output_tile_entries + ramp_up_time) {
-                    //     for (int i = 0; i < IC0; i++) {
-                    //         input_reg[i][0] = input_buf.value[i];
-                    //     }
-                    // }
-
                 // Your code ends here
                 // -------------------------------
 
@@ -196,12 +190,13 @@ public:
                 // Set partial outputs for the array to psum_buf.
                 // Depending on the loop index, the partial output will be 0 or a value from the accumulation buffer
                 // Your code starts here
-                // if (step < num_output_tile_entries ){
-                    if ((loopIndices.ic1_idx == 0 && loopIndices.fx_idx == 0 && loopIndices.fy_idx == 0)) {
+                    if ((loopIndex.ic1_idx == 0 && 
+                        loopIndex.fx_idx == 0 && 
+                        loopIndex.fy_idx == 0)) {
                         for (int i = 0; i < OC0; i++) {
                             psum_buf.value[i] = 0;
                         }
-                    } else if (step < num_output_tile_entries) {
+                    } else if (step < tile_entries) {
                         psum_buf = accumulation_buffer.value[step];
                     }
                 // }
@@ -243,7 +238,7 @@ public:
                         pe_array[r][c].run(
                             ifmap_in.value[c].value[r], 
                             ofmap_in.value[r].value[c], 
-                            weight_array.value[r].value[c], 
+                            weight_reg.value[r].value[c], 
                             ifmap_out.value[c].value[r], 
                             psum_reg.value[r].value[c]);
                     }
@@ -280,7 +275,9 @@ public:
                 // Depending on the loop indices, this valid output will either be written into the accumulation buffer or written out
                 // Your code starts here
                 if (step >= ramp_up_time + flush) {
-                    if ((loopIndices.ic1_idx == params.IC1 - 1) && (loopIndices.fx_idx == params.FX - 1) && (loopIndices.fy_idx == params.FY - 1)) {
+                    if ((loopIndex.ic1_idx == params.IC1 - 1) && 
+                    (loopIndex.fx_idx == params.FX - 1) && 
+                    (loopIndex.fy_idx == params.FY - 1)) {
                         output.write(output_row);
                     } else {
                         accumulation_buffer.value[step - (ramp_up_time + flush)] = output_row;
@@ -325,7 +322,7 @@ private:
 
     ProcessingElement<IDTYPE, WDTYPE, ODTYPE> pe_array[OC0][IC0];
 
-    PackedInt2D<WEIGHT_PRECISION, OC0, IC0> weight_array;
+    PackedInt2D<WEIGHT_PRECISION, OC0, IC0> weight_reg;
     PackedInt2D<INPUT_PRECISION, IC0, OC0> ifmap_in;
     PackedInt2D<OUTPUT_PRECISION, OC0, ACCUMULATION_BUFFER_SIZE> accumulation_buffer;
     PackedInt2D<OUTPUT_PRECISION, OC0, IC0> ofmap_in;
