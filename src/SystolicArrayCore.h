@@ -106,7 +106,7 @@ public:
         #endif
 
         #ifndef __SYNTHESIS__
-        while(loopIndicesIn.available(1) && paramsIn.available(1))
+        while(loopIndicesIn.available(1))
         #endif
         {
             // -------------------------------
@@ -302,7 +302,7 @@ public:
                 }
                 // Your code ends here
                 // -------------------------------
-                // if (step == step_bound-1) break;
+                if (step == step_bound-1) break;
                 // step++;
                 
             }
