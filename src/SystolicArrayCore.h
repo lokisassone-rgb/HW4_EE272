@@ -115,19 +115,20 @@ public:
             Params params = paramsIn.read();
             LoopIndices loopIndex = loopIndicesIn.read();
             // Your code ends here
-            // -------------------------------
-            // int step_bound = params.OY0 * params.OX0 + params.FY + params.FX - 1;//
-            int tile_entries = params.OY0 * params.OX0;
-            int ramp_up_time = IC0 - 1;
-            int flush = OC0 - 1 ;
-            int step_bound = ramp_up_time + tile_entries + flush;
-            int step = 0;
+
+
 
             // -------------------------------
             // Create a loop for a "run" of the systolic array.
             // The number of steps in a run of the systolic array is equal to:
             // the ramp-up time + number of pixels + flush time
             // Your code starts here
+            int tile_entries = params.OY0 * params.OX0; //setting up variables for ramp up tile num and flush
+            int ramp_up_time = IC0 - 1;
+            int flush = OC0 - 1 ;
+            int step_bound = ramp_up_time + tile_entries + flush;
+            int step = 0;
+
             for (step = 0; step < step_bound; step++) { 
 
             // Your code ends here 
@@ -190,6 +191,7 @@ public:
                 // Set partial outputs for the array to psum_buf.
                 // Depending on the loop index, the partial output will be 0 or a value from the accumulation buffer
                 // Your code starts here
+                 //set partial output to 0 only when all ic1 fx and fy are 0 as in working on new pixel
                     if ((loopIndex.ic1_idx == 0 && 
                         loopIndex.fx_idx == 0 && 
                         loopIndex.fy_idx == 0)) {
@@ -233,6 +235,7 @@ public:
                 // Run the 16x16 PE array
                 // Make sure that the correct registers are given to the PE
                 // Your code starts here
+                //MAC each input/weight with incoming psum and fwd results
                 for (int r = 0; r < OC0; r++) {
                     for (int c = 0; c < IC0; c++) {
                         pe_array[r][c].run(
@@ -274,6 +277,8 @@ public:
                 // After a certain number of cycles, you will have valid output from the systolic array
                 // Depending on the loop indices, this valid output will either be written into the accumulation buffer or written out
                 // Your code starts here
+
+                //after pipeline fill, write final outputs or accumulate psums
                 if (step >= ramp_up_time + flush) {
                     if ((loopIndex.ic1_idx == params.IC1 - 1) && 
                     (loopIndex.fx_idx == params.FX - 1) && 
@@ -291,6 +296,7 @@ public:
                 // Cycle the input/psum registers
                 // That is, the outputs that a PE wrote to should now become the input for the next PE
                 // Your code starts here
+                //loops shift register arrays by unrolling IC0 and OC0 to next output and input
                 for (int i = 0; i < IC0 - 1; i++) {
                     ifmap_in.value[i+1] = ifmap_out.value[i];
                 }
@@ -321,10 +327,9 @@ private:
     // Your code starts here
 
     ProcessingElement<IDTYPE, WDTYPE, ODTYPE> pe_array[OC0][IC0];
-
+    PackedInt2D<OUTPUT_PRECISION, OC0, ACCUMULATION_BUFFER_SIZE> accumulation_buffer;
     PackedInt2D<WEIGHT_PRECISION, OC0, IC0> weight_reg;
     PackedInt2D<INPUT_PRECISION, IC0, OC0> ifmap_in;
-    PackedInt2D<OUTPUT_PRECISION, OC0, ACCUMULATION_BUFFER_SIZE> accumulation_buffer;
     PackedInt2D<OUTPUT_PRECISION, OC0, IC0> ofmap_in;
     PackedInt2D<INPUT_PRECISION, IC0, OC0> ifmap_out;
     PackedInt2D<OUTPUT_PRECISION, OC0, IC0> psum_reg;
