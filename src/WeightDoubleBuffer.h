@@ -17,24 +17,24 @@ public:
 
         Params params = paramsIn.read(); // read params
 
-        for (uint_16 oy1_idx = 0; oy1_idx < params.OY1; oy1_idx++) {
-            for (uint_16 ox1_idx = 0; ox1_idx < params.OX1; ox1_idx++) {
-                for (uint_16 oc1_idx = 0; oc1_idx < params.OC1; oc1_idx++) {
+        for (int oy1 = 0; oy1 < params.OY1; oy1++) {
+            for (int ox1 = 0; ox1 < params.OX1; ox1++) {
+                for (int oc1 = 0; oc1 < params.OC1; oc1++) {
 
-                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> tile;
+                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp;
                     PackedInt<WEIGHT_PRECISION, 4> inputItem;
 
-                    uint_16 numTileItems = params.IC1 * params.FY * params.FX * IC0;
+                    int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
                     for (int tileItemIdx = 0; tileItemIdx < numTileItems; tileItemIdx++) {
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) { // assume OC0 is a power of two >= 4
                             inputItem = din.read(); // read next 4-packed input item
                             for (int i = 0; i < 4; i++) {
-                                tile.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
+                                temp.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
                             }
                         }
                     }
 
-                    dout.write(tile); // write tile (infers double buffer)
+                    dout.write(temp); // write tile (infers double buffer)
                 }
             }
         }
@@ -59,15 +59,15 @@ public:
 
         Params params = paramsIn.read(); // read params
 
-        for (uint_16 oy1_idx = 0; oy1_idx < params.OY1; oy1_idx++) {
-            for (uint_16 ox1_idx = 0; ox1_idx < params.OX1; ox1_idx++) {
-                for (uint_16 oc1_idx = 0; oc1_idx < params.OC1; oc1_idx++) {
+        for (int oy1 = 0; oy1 < params.OY1; oy1++) {
+            for (int ox1 = 0; ox1 < params.OX1; ox1++) {
+                for (int oc1 = 0; oc1 < params.OC1; oc1++) {
 
-                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> tile = din.read(); // read tile (infers double buffer)
+                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp = din.read();
 
-                    uint_16 numTileItems = params.IC1 * params.FY * params.FX * IC0;
+                    int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
                     for (int adr = 0; adr < numTileItems; adr++) {
-                        dout.write(tile.data[adr]); // write weights in sequential order for the systolic array to digest
+                        dout.write(temp.data[adr]); // write weights in sequential order for the systolic array to digest
                     }
                 }
             }
