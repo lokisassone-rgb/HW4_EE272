@@ -26,8 +26,8 @@ public:
 
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
                     for (int tileItemIdx = 0; tileItemIdx < numTileItems; tileItemIdx++) {
-                        for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) { // assume OC0 is a power of two >= 4
-                            inputItem = din.read(); // read next 4-packed input item
+                        for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
+                            inputItem = din.read();
                             for (int i = 0; i < 4; i++) {
                                 temp.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
                             }
@@ -67,7 +67,7 @@ public:
 
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
                     for (int adr = 0; adr < numTileItems; adr++) {
-                        dout.write(temp.data[adr]); // write weights in sequential order for the systolic array to digest
+                        dout.write(temp.data[adr]); // write tile item by item (infers double buffer)
                     }
                 }
             }
