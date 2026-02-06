@@ -37,7 +37,7 @@ directive set /SystolicArrayCore<IDTYPE,WDTYPE,ODTYPE,${ARRAY_DIMENSION},${ARRAY
 directive set /SystolicArrayCore<IDTYPE,WDTYPE,ODTYPE,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/run/ifmap_out.value.value:rsc -MAP_TO_MODULE {[Register]}
 directive set /SystolicArrayCore<IDTYPE,WDTYPE,ODTYPE,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/run/ofmap_in.value.value:rsc -MAP_TO_MODULE {[Register]}
 directive set /SystolicArrayCore<IDTYPE,WDTYPE,ODTYPE,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/run/psum_reg.value.value:rsc -MAP_TO_MODULE {[Register]}
-directive set /SystolicArrayCore<IDTYPE,WDTYPE,ODTYPE,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/run/weight_array.value.value:rsc -MAP_TO_MODULE {[Register]}
+directive set /SystolicArrayCore<IDTYPE,WDTYPE,ODTYPE,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/run/weight_reg.value.value:rsc -MAP_TO_MODULE {[Register]}
 
 directive set /SystolicArrayCore<IDTYPE,WDTYPE,ODTYPE,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/run -REGISTER_THRESHOLD 4096
 # Your code ends here
