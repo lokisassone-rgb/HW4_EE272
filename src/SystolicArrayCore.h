@@ -123,14 +123,14 @@ public:
             // The number of steps in a run of the systolic array is equal to:
             // the ramp-up time + number of pixels + flush time
             // Your code starts here
-            int tile_entries = params.OY0 * params.OX0; //setting up variables for ramp up tile num and flush
-            int ramp_up_time = IC0 - 1;
-            int flush = OC0 - 1 ;
-            int step_bound = ramp_up_time + tile_entries + flush;
-            int step = 0;
+            uint_16 tile_entries = params.OY0 * params.OX0; //setting up variables for ramp up tile num and flush
+            uint_16 ramp_up_time = IC0 - 1;
+            uint_16 flush = OC0 - 1;
+            uint_16 step_bound = ramp_up_time + tile_entries + flush;
+            const uint_16 max_step = IC0_MAX + OC0_MAX + OX0_MAX * OY0_MAX - 1;
             
             #pragma hls_pipeline_init_interval 1
-            for (step = 0; step < step_bound; step++) { 
+            for (uint_16 step = 0; step < max_step; ++step) { 
 
             // Your code ends here 
             // You should now be in the body of the loop
