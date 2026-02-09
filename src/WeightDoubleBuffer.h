@@ -16,25 +16,21 @@ public:
         // Your code starts here
 
         Params params = paramsIn.read(); // read params
+        PackedInt<WEIGHT_PRECISION, 4> inputItem;
 
         for (int oy1 = 0; oy1 < params.OY1; oy1++) {
             for (int ox1 = 0; ox1 < params.OX1; ox1++) {
                 for (int oc1 = 0; oc1 < params.OC1; oc1++) {
-
-                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp;
-                    PackedInt<WEIGHT_PRECISION, 4> inputItem;
-
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
                     for (int tileItemIdx = 0; tileItemIdx < numTileItems; tileItemIdx++) {
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
                             inputItem = din.read();
                             for (int i = 0; i < 4; i++) {
-                                temp.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
+                                writer_buffer.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
                             }
                         }
                     }
-
-                    dout.write(temp); // write tile (infers double buffer)
+                    dout.write(writer_buffer); // write tile (infers double buffer)
                 }
             }
         }
@@ -42,6 +38,9 @@ public:
         // Your code ends here
         // -------------------------------
     }
+
+private:
+    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> writer_buffer;
 };
 
 template <int size, int IC0, int OC0>
@@ -62,12 +61,10 @@ public:
         for (int oy1 = 0; oy1 < params.OY1; oy1++) {
             for (int ox1 = 0; ox1 < params.OX1; ox1++) {
                 for (int oc1 = 0; oc1 < params.OC1; oc1++) {
-
-                    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp = din.read();
-
+                    reader_buffer = din.read();
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
                     for (int adr = 0; adr < numTileItems; adr++) {
-                        dout.write(temp.data[adr]); // write tile item by item (infers double buffer)
+                        dout.write(reader_buffer.data[adr]); // write tile item by item (infers double buffer)
                     }
                 }
             }
@@ -76,6 +73,9 @@ public:
         // Your code ends here
         // -------------------------------
     }
+
+private:
+    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> reader_buffer;
 };
 
 template <int size, int IC0, int OC0>

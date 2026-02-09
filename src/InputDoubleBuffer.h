@@ -19,8 +19,6 @@ public:
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
         int sizeofDoubleBuffer = ix0*iy0*params.IC1;
 
-
-        chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
 
@@ -36,15 +34,16 @@ public:
                     tempdinwrite.value[k*4+2] = tempdinread.value[2];
                     tempdinwrite.value[k*4+3] = tempdinread.value[3];
                 }
-                
-                temp.data[j] = tempdinwrite;
+                writer_buffer.data[j] = tempdinwrite;
             }
-            
-            dout.write(temp);
+            dout.write(writer_buffer);
         }
         // Your code ends here
         // -------------------------------
     }
+
+private:
+    chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> writer_buffer;
 };
 
 template <int size, int IC0, int OC0>
@@ -64,11 +63,9 @@ public:
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY; //calculate input height
         int numberofTiles = params.OX1 * params.OY1;
 
-        chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp; //initialize tile struct
-
         for (int oy1 = 0; oy1 < params.OY1; oy1++){ //read in inputs in same input tiling as mentioned in review session week 3
             for (int ox1 = 0; ox1 < params.OX1; ox1++){
-                temp = din.read(); //create new tile 
+                reader_buffer = din.read(); // store in persistent buffer
                 for (int oc1 = 0; oc1 < params.OC1; oc1++){
                     for (int ic1 = 0; ic1 < params.IC1; ic1++){
                         for (int fy = 0; fy < params.FY; fy++){
@@ -78,7 +75,7 @@ public:
                                         int iy = oy0 * params.STRIDE + fy;
                                         int ix = ox0 * params.STRIDE + fx;
                                         int buffer_add = ic1 * (iy0 * ix0) + iy * ix0 + ix; //calculate address linearly
-                                        dout.write(temp.data[buffer_add]);
+                                        dout.write(reader_buffer.data[buffer_add]);
                                     }
                                 }
                             }
@@ -90,6 +87,9 @@ public:
         // Your code ends here
         // -------------------------------
     }
+
+private:
+    chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> reader_buffer;
 };
 
 template <int size, int IC0, int OC0>
