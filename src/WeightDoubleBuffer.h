@@ -26,7 +26,7 @@ public:
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
                             inputItem = din.read();
                             for (int i = 0; i < 4; i++) {
-                                writer_buffer.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
+                                writer_buffer[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
                             }
                         }
                     }
@@ -40,7 +40,7 @@ public:
     }
 
 private:
-    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> writer_buffer;
+    PackedInt<WEIGHT_PRECISION, OC0> writer_buffer[size];
 };
 
 template <int size, int IC0, int OC0>
@@ -64,7 +64,7 @@ public:
                     reader_buffer = din.read();
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
                     for (int adr = 0; adr < numTileItems; adr++) {
-                        dout.write(reader_buffer.data[adr]); // write tile item by item (infers double buffer)
+                        dout.write(reader_buffer[adr]); // write tile item by item (infers double buffer)
                     }
                 }
             }
@@ -75,7 +75,7 @@ public:
     }
 
 private:
-    chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> reader_buffer;
+    PackedInt<WEIGHT_PRECISION, OC0> reader_buffer[size];
 };
 
 template <int size, int IC0, int OC0>

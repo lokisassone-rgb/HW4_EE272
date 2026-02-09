@@ -34,7 +34,7 @@ public:
                     tempdinwrite.value[k*4+2] = tempdinread.value[2];
                     tempdinwrite.value[k*4+3] = tempdinread.value[3];
                 }
-                writer_buffer.data[j] = tempdinwrite;
+                writer_buffer[j] = tempdinwrite;
             }
             dout.write(writer_buffer);
         }
@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> writer_buffer;
+    PackedInt<INPUT_PRECISION,IC0> writer_buffer[size];
 };
 
 template <int size, int IC0, int OC0>
@@ -75,7 +75,7 @@ public:
                                         int iy = oy0 * params.STRIDE + fy;
                                         int ix = ox0 * params.STRIDE + fx;
                                         int buffer_add = ic1 * (iy0 * ix0) + iy * ix0 + ix; //calculate address linearly
-                                        dout.write(reader_buffer.data[buffer_add]);
+                                        dout.write(reader_buffer[buffer_add]);
                                     }
                                 }
                             }
@@ -89,7 +89,7 @@ public:
     }
 
 private:
-    chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> reader_buffer;
+    PackedInt<INPUT_PRECISION,IC0> reader_buffer[size];
 };
 
 template <int size, int IC0, int OC0>
