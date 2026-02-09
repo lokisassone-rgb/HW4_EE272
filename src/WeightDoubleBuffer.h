@@ -25,7 +25,6 @@ public:
                     PackedInt<WEIGHT_PRECISION, 4> inputItem;
 
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
-                    #pragma hls_pipeline_init_interval 1
                     for (int tileItemIdx = 0; tileItemIdx < numTileItems; tileItemIdx++) {
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
                             inputItem = din.read();
