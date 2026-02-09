@@ -113,9 +113,6 @@ public:
             // Read in the params and loop indices from the channel
             // Your code starts here
             Params params = paramsIn.read();
-            for (uint_16 ic1 = 0; ic1 < params.IC1; ++ic1) {
-                for (uint_16 fy = 0; fy < params.FY; ++fy) {
-                    for (uint_16 fx = 0; fx < params.FX; ++fx) {
             // Your code ends here
 
 
@@ -130,9 +127,14 @@ public:
             uint_16 flush = OC0 - 1;
             uint_16 step_bound = ramp_up_time + tile_entries + flush;
             const uint_16 max_step = IC0_MAX + OC0_MAX + OX0_MAX * OY0_MAX - 1;
+            const uint_32 max_total_steps = (uint_32)(IC1_MAX * FY_MAX * FX_MAX) * (uint_32)max_step;
+            uint_16 ic1 = 0;
+            uint_16 fy = 0;
+            uint_16 fx = 0;
+            uint_16 step = 0;
             
             #pragma hls_pipeline_init_interval 1
-            for (uint_16 step = 0; step < max_step; ++step) { 
+            for (uint_32 step_all = 0; step_all < max_total_steps; ++step_all) {
 
             // Your code ends here 
             // You should now be in the body of the loop
@@ -313,11 +315,22 @@ public:
                 }
                 // Your code ends here
                 // -------------------------------
-                if (step == step_bound-1) break;
-                // step++;
-                
-            }
+                if (step == step_bound - 1) {
+                    step = 0;
+                    fx++;
+                    if (fx == params.FX) {
+                        fx = 0;
+                        fy++;
+                        if (fy == params.FY) {
+                            fy = 0;
+                            ic1++;
+                            if (ic1 == params.IC1) {
+                                break;
+                            }
+                        }
                     }
+                } else {
+                    step++;
                 }
             }
         }
