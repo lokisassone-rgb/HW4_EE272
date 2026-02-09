@@ -25,10 +25,13 @@ public:
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
 
         for (int i=0; i < numberofTiles; i++){
+            #pragma hls_pipeline_init_interval 1
             for (int j=0; j < sizeofDoubleBuffer; j++){
+                #pragma hls_unroll yes
                 for (int idx = 0; idx < IC0; idx++) {
                     tempdinwrite.value[idx] = 0;
                 }
+                #pragma hls_unroll yes
                 for (int k=0; k<IC0/4; k++){
                     tempdinread = din.read();
                     tempdinwrite.value[k*4] = tempdinread.value[0];
@@ -74,6 +77,7 @@ public:
                         for (int fy = 0; fy < params.FY; fy++){
                             for (int fx = 0; fx < params.FX; fx++){
                                 for (int oy0 = 0; oy0 < params.OY0; oy0++){
+                                    #pragma hls_pipeline_init_interval 1
                                     for (int ox0 = 0; ox0 < params.OX0; ox0++){ //skip IC0 as unrolled in inputs
                                         int iy = oy0 * params.STRIDE + fy;
                                         int ix = ox0 * params.STRIDE + fx;

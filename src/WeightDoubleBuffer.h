@@ -25,9 +25,11 @@ public:
                     PackedInt<WEIGHT_PRECISION, 4> inputItem;
 
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
+                    #pragma hls_pipeline_init_interval 1
                     for (int tileItemIdx = 0; tileItemIdx < numTileItems; tileItemIdx++) {
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
                             inputItem = din.read();
+                            #pragma hls_unroll yes
                             for (int i = 0; i < 4; i++) {
                                 temp.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i]; //
                             }
@@ -66,6 +68,7 @@ public:
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp = din.read();
 
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0; //number of calculations per pixel
+                    #pragma hls_pipeline_init_interval 1
                     for (int adr = 0; adr < numTileItems; adr++) {
                         dout.write(temp.data[adr]); // write tile item by item into address
                     }
