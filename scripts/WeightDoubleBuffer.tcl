@@ -24,7 +24,7 @@ directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/me
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferReader<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/din -WORD_WIDTH $word_width
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferWriter<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/dout -WORD_WIDTH $word_width
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/mem -WORD_WIDTH $word_width
-directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/.../temp.data.value -match glob-WORD_WIDTH $word_width
+directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/.../temp.data.value -match glob -WORD_WIDTH $word_width
 # Your code ends here
 # -------------------------------
 
