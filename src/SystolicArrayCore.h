@@ -106,14 +106,16 @@ public:
         #endif
 
         #ifndef __SYNTHESIS__
-        while(loopIndicesIn.available(1))
+        while(paramsIn.available(1))
         #endif
         {
             // -------------------------------
             // Read in the params and loop indices from the channel
             // Your code starts here
             Params params = paramsIn.read();
-            LoopIndices loopIndex = loopIndicesIn.read();
+            for (uint_16 ic1 = 0; ic1 < params.IC1; ++ic1) {
+                for (uint_16 fy = 0; fy < params.FY; ++fy) {
+                    for (uint_16 fx = 0; fx < params.FX; ++fx) {
             // Your code ends here
 
 
@@ -193,9 +195,9 @@ public:
                 // Depending on the loop index, the partial output will be 0 or a value from the accumulation buffer
                 // Your code starts here
                  //set partial output to 0 only when all ic1 fx and fy are 0 as in working on new pixel
-                    if ((loopIndex.ic1_idx == 0 && 
-                        loopIndex.fx_idx == 0 && 
-                        loopIndex.fy_idx == 0)) {
+                    if ((ic1 == 0 && 
+                        fx == 0 && 
+                        fy == 0)) {
                         #pragma hls_unroll yes
                         for (int i = 0; i < OC0; i++) {
                             psum_buf.value[i] = 0;
@@ -284,9 +286,9 @@ public:
 
                 //after pipeline fill, write final outputs or accumulate psums
                 if (step >= ramp_up_time + flush) {
-                    if ((loopIndex.ic1_idx == params.IC1 - 1) && 
-                    (loopIndex.fx_idx == params.FX - 1) && 
-                    (loopIndex.fy_idx == params.FY - 1)) {
+                    if ((ic1 == params.IC1 - 1) && 
+                    (fx == params.FX - 1) && 
+                    (fy == params.FY - 1)) {
                         output.write(output_row);
                     } else {
                         accumulation_buffer.value[step - (ramp_up_time + flush)] = output_row;
@@ -314,6 +316,9 @@ public:
                 if (step == step_bound-1) break;
                 // step++;
                 
+            }
+                    }
+                }
             }
         }
     
