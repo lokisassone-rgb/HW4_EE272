@@ -16,6 +16,8 @@ public:
         // Your code starts here
 
         Params params = paramsIn.read(); // read params
+        
+        PackedInt<WEIGHT_PRECISION, OC0> writer_buffer[size];
         PackedInt<WEIGHT_PRECISION, 4> inputItem;
 
         for (int oy1 = 0; oy1 < params.OY1; oy1++) {
@@ -40,7 +42,7 @@ public:
     }
 
 private:
-    PackedInt<WEIGHT_PRECISION, OC0> writer_buffer[size];
+    //PackedInt<WEIGHT_PRECISION, OC0> writer_buffer[size];
 };
 
 template <int size, int IC0, int OC0>
@@ -57,6 +59,8 @@ public:
         // Your code starts here
 
         Params params = paramsIn.read(); // read params
+        PackedInt<WEIGHT_PRECISION, OC0> reader_buffer[size];
+
 
         for (int oy1 = 0; oy1 < params.OY1; oy1++) {
             for (int ox1 = 0; ox1 < params.OX1; ox1++) {
@@ -75,7 +79,7 @@ public:
     }
 
 private:
-    PackedInt<WEIGHT_PRECISION, OC0> reader_buffer[size];
+    //PackedInt<WEIGHT_PRECISION, OC0> reader_buffer[size];
 };
 
 template <int size, int IC0, int OC0>

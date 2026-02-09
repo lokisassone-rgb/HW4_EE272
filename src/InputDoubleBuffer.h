@@ -19,6 +19,7 @@ public:
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
         int sizeofDoubleBuffer = ix0*iy0*params.IC1;
 
+        PackedInt<INPUT_PRECISION,IC0> writer_buffer[size];
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
 
@@ -43,7 +44,7 @@ public:
     }
 
 private:
-    PackedInt<INPUT_PRECISION,IC0> writer_buffer[size];
+   //PackedInt<INPUT_PRECISION,IC0> writer_buffer[size];
 };
 
 template <int size, int IC0, int OC0>
@@ -62,6 +63,8 @@ public:
         int ix0 = (params.OX0 -1 )*params.STRIDE + params.FX; //calculate input width
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY; //calculate input height
         int numberofTiles = params.OX1 * params.OY1;
+
+        PackedInt<INPUT_PRECISION,IC0> reader_buffer[size];
 
         for (int oy1 = 0; oy1 < params.OY1; oy1++){ //read in inputs in same input tiling as mentioned in review session week 3
             for (int ox1 = 0; ox1 < params.OX1; ox1++){
@@ -89,7 +92,7 @@ public:
     }
 
 private:
-    PackedInt<INPUT_PRECISION,IC0> reader_buffer[size];
+    // PackedInt<INPUT_PRECISION,IC0> reader_buffer[size];
 };
 
 template <int size, int IC0, int OC0>
