@@ -31,7 +31,6 @@ public:
                 for (int idx = 0; idx < IC0; idx++) {
                     tempdinwrite.value[idx] = 0;
                 }
-                #pragma hls_unroll yes
                 for (int k=0; k<IC0/4; k++){
                     tempdinread = din.read();
                     tempdinwrite.value[k*4] = tempdinread.value[0];
