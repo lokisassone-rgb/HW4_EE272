@@ -128,7 +128,8 @@ public:
             int flush = OC0 - 1 ;
             int step_bound = ramp_up_time + tile_entries + flush;
             int step = 0;
-
+            
+            #pragma hls_pipeline_init_interval 1
             for (step = 0; step < step_bound; step++) { 
 
             // Your code ends here 
@@ -195,6 +196,7 @@ public:
                     if ((loopIndex.ic1_idx == 0 && 
                         loopIndex.fx_idx == 0 && 
                         loopIndex.fy_idx == 0)) {
+                        #pragma hls_unroll yes
                         for (int i = 0; i < OC0; i++) {
                             psum_buf.value[i] = 0;
                         }
@@ -236,7 +238,9 @@ public:
                 // Make sure that the correct registers are given to the PE
                 // Your code starts here
                 //MAC each input/weight with incoming psum and fwd results
+                #pragma hls_unroll yes
                 for (int r = 0; r < OC0; r++) {
+                    #pragma hls_unroll yes
                     for (int c = 0; c < IC0; c++) {
                         pe_array[r][c].run(
                             ifmap_in.value[c].value[r], 
@@ -297,9 +301,11 @@ public:
                 // That is, the outputs that a PE wrote to should now become the input for the next PE
                 // Your code starts here
                 //loops shift register arrays by unrolling IC0 and OC0 to next output and input
+                #pragma hls_unroll yes
                 for (int i = 0; i < IC0 - 1; i++) {
                     ifmap_in.value[i+1] = ifmap_out.value[i];
                 }
+                #pragma hls_unroll yes
                 for (int i = 0; i < OC0 - 1; i++) {
                     ofmap_in.value[i+1] = psum_reg.value[i];
                 }
