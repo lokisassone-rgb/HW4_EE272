@@ -14,35 +14,47 @@ public:
     {
         // -------------------------------
         // Your code starts here
+        // -------------------------------
 
-        Params params = paramsIn.read(); // read params
-        
-        PackedInt<WEIGHT_PRECISION, OC0> writer_buffer[size];
-        PackedInt<WEIGHT_PRECISION, 4> inputItem;
+        #ifndef __SYNTHESIS__
+        /* Note on ac_channel guards:
+         * We expect to read numTiles * tileSize from din. Our C sim will run fine without
+         * this guard since we explicitly write all the data before executing a kernel in the
+         * testbench. However, it is good style and practice for writing modules in the future
+         * since sometimes you cannot control when data will be written to a interface. For example,
+         * if we decided connect our module to a memory simulation that writes din sporadically the
+         * module will fail on a non-blocking din read in a C sim without the guard.
+         */
+        while (paramsIn.available(1) && din.available((paramsIn[0].OX1.to_int() * paramsIn[0].OY1.to_int() * paramsIn[0].OC1.to_int() *
+                                                       paramsIn[0].IC1.to_int()*IC0*paramsIn[0].FX.to_int()*paramsIn[0].FY.to_int()) / 4))
+        #endif
+        {
+            Params params = paramsIn.read();
+            ac_int<ac::log2_ceil<size+1>::val, false> tileSize = params.FX * params.FY * IC0 * params.IC1;
 
-        for (int oy1 = 0; oy1 < params.OY1; oy1++) {
-            for (int ox1 = 0; ox1 < params.OX1; ox1++) {
-                for (int oc1 = 0; oc1 < params.OC1; oc1++) {
-                    int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
-                    for (int tileItemIdx = 0; tileItemIdx < numTileItems; tileItemIdx++) {
-                        for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
-                            inputItem = din.read();
-                            for (int i = 0; i < 4; i++) {
-                                writer_buffer[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i];
-                            }
+            TILES: for (int t = 0; t < params.OX1 * params.OY1 * params.OC1; t++) {
+                chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> tmp;
+                TILE: for (int i = 0; i < tileSize; i++) {
+                    // each packet contains 4 values, pack OC0 tgt into one row
+                    PackedInt<WEIGHT_PRECISION, OC0> memRow;  // one row in the memory
+                    for (int j = 0; j < OC0; j=j+4) {
+                        PackedInt<WEIGHT_PRECISION, 4> packet = din.read();
+
+                        for (int k = 0; k < 4; k++) {
+                            memRow.value[j+k] = packet.value[k];
                         }
                     }
-                    dout.write(writer_buffer); // write tile (infers double buffer)
-                }
-            }
+                    tmp.data[i] = memRow;
+
+                }  // TILE
+                dout.write(tmp);
+            } // TILES
         }
 
+        // -------------------------------
         // Your code ends here
         // -------------------------------
     }
-
-private:
-    //PackedInt<WEIGHT_PRECISION, OC0> writer_buffer[size];
 };
 
 template <int size, int IC0, int OC0>
@@ -57,29 +69,29 @@ public:
     {
         // -------------------------------
         // Your code starts here
+        // -------------------------------
 
-        Params params = paramsIn.read(); // read params
-        PackedInt<WEIGHT_PRECISION, OC0> reader_buffer[size];
+        #ifndef __SYNTHESIS__
+        while (paramsIn.available(1))
+        #endif
+        {
+            Params params = paramsIn.read();
+            ac_int<ac::log2_ceil<size+1>::val, false> tileSize = params.FX * params.FY * IC0 * params.IC1;
 
-
-        for (int oy1 = 0; oy1 < params.OY1; oy1++) {
-            for (int ox1 = 0; ox1 < params.OX1; ox1++) {
-                for (int oc1 = 0; oc1 < params.OC1; oc1++) {
-                    reader_buffer = din.read();
-                    int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
-                    for (int adr = 0; adr < numTileItems; adr++) {
-                        dout.write(reader_buffer[adr]); // write tile item by item (infers double buffer)
-                    }
-                }
-            }
+            // read in new tile for every oc1
+            TILES: for (int t = 0; t < params.OX1 * params.OY1 * params.OC1; t++) {
+                chanStruct<PackedInt<WEIGHT_PRECISION, OC0>,size> tmp;
+                tmp = din.read();
+                TILE: for (int i = 0; i < tileSize; i++) {
+                    dout.write(tmp.data[i]);
+                } // TILE
+            } // TILES
         }
 
+        // -------------------------------
         // Your code ends here
         // -------------------------------
     }
-
-private:
-    //PackedInt<WEIGHT_PRECISION, OC0> reader_buffer[size];
 };
 
 template <int size, int IC0, int OC0>
@@ -92,18 +104,23 @@ public:
                       ac_channel<PackedInt<WEIGHT_PRECISION, OC0> > &weights_out,
                       ac_channel<Params> &paramsIn)
     {
-        Params params = paramsIn.read();
+        #ifndef __SYNTHESIS__
+        while (paramsIn.available(1))
+        #endif
+        {
+            Params params = paramsIn.read();
 
-        // #ifndef __SYNTHESIS__
-        // ac_int<ac::log2_ceil<size>::val, false> block_size = IC0*params.IC1*params.FX*params.FY;
-        // assert(block_size <= size);
-        // #endif
+            // #ifndef __SYNTHESIS__
+            // ac_int<ac::log2_ceil<size>::val, false> block_size = IC0*params.OC1*params.FX*params.FY;
+            // assert(block_size <= size);
+            // #endif
 
-        weightDoubleBufferReaderParams.write(params);
-        weightDoubleBufferWriterParams.write(params);
+            weightDoubleBufferReaderParams.write(params);
+            weightDoubleBufferWriterParams.write(params);
 
-        weightDoubleBufferWriter.run(weightDoubleBufferWriterParams, weights_in, mem);
-        weightDoubleBufferReader.run(weightDoubleBufferReaderParams, mem, weights_out);
+            weightDoubleBufferWriter.run(weightDoubleBufferWriterParams, weights_in, mem);
+            weightDoubleBufferReader.run(weightDoubleBufferReaderParams, mem, weights_out);
+        }
     }
 
 private:
