@@ -18,7 +18,6 @@ public:
         // Your code starts here
 
         Params params = paramsIn.read(); // read params
-        #pragma hls_pipeline_init_interval 1
         for (int oy1 = 0; oy1 < OY1_MAX; oy1++) {//oy and ox number of tiles
             if (oy1 >= params.OY1) { break; }
             for (int ox1 = 0; ox1 < OX1_MAX; ox1++) {
@@ -31,6 +30,7 @@ public:
                     PackedInt<WEIGHT_PRECISION, OC0> tempdinwrite;
 
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
+                    #pragma hls_pipeline_init_interval 1
                     for (int tileItemIdx = 0; tileItemIdx < size; tileItemIdx++) {
                         if (tileItemIdx >= numTileItems) { break; }
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
@@ -67,7 +67,6 @@ public:
         // Your code starts here
 
         Params params = paramsIn.read(); // read params
-        #pragma hls_pipeline_init_interval 1
         for (int oy1 = 0; oy1 < OY1_MAX; oy1++) {
             if (oy1 >= params.OY1) { break; }
             for (int ox1 = 0; ox1 < OX1_MAX; ox1++) {
@@ -78,7 +77,7 @@ public:
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp = din.read();
 
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0; //number of calculations per pixel
-                  //  #pragma hls_pipeline_init_interval 1
+                    #pragma hls_pipeline_init_interval 1
                     for (int adr = 0; adr < size; adr++) {
                         if (adr >= numTileItems) { break; }
                         dout.write(temp.data[adr]); // write tile item by item into address

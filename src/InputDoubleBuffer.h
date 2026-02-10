@@ -27,10 +27,6 @@ public:
         for (int i=0; i < numberofTiles; i++){
             #pragma hls_pipeline_init_interval 1
             for (int j=0; j < sizeofDoubleBuffer; j++){
-                #pragma hls_unroll yes
-                for (int idx = 0; idx < IC0; idx++) {
-                    tempdinwrite.value[idx] = 0;
-                }
                 for (int k=0; k<IC0/4; k++){
                     tempdinread = din.read();
                     tempdinwrite.value[k*4] = tempdinread.value[0];
