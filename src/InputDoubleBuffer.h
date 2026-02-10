@@ -7,6 +7,8 @@ class InputDoubleBufferWriter{
 public:
     InputDoubleBufferWriter(){}
 
+    chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> tmp;
+
     #pragma hls_design interface
     void CCS_BLOCK(run)(ac_channel<Params> &paramsIn,
                         ac_channel<PackedInt<INPUT_PRECISION, 4> > &din,
@@ -37,7 +39,7 @@ public:
                                 params.IC1;
             
             TILES: for (int t = 0; t < params.OX1 * params.OY1; t++) {
-                chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> tmp;
+                //chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> tmp;
 
                 // record one tile in buffer
                 TILE: for (int i = 0; i < tileSize; i++) {
@@ -68,6 +70,8 @@ class InputDoubleBufferReader{
 public:
     InputDoubleBufferReader(){}
 
+    chanStruct<PackedInt<INPUT_PRECISION, IC0>,size> tmp;
+
     #pragma hls_design interface
     void CCS_BLOCK(run)(ac_channel<Params> &paramsIn,
                         ac_channel<chanStruct<PackedInt<INPUT_PRECISION, IC0>,size> > &din, 
@@ -86,7 +90,7 @@ public:
             uint_16 IY0 = (params.OY0 - 1) * params.STRIDE + params.FY;
 
             TILES: for (int t = 0; t < params.OX1 * params.OY1; t++) {
-                chanStruct<PackedInt<INPUT_PRECISION, IC0>,size> tmp;
+                //chanStruct<PackedInt<INPUT_PRECISION, IC0>,size> tmp;
                 
                 // read one tile from memory, and pass out one address at a time in the correct order
                 tmp = din.read();
