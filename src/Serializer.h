@@ -20,19 +20,12 @@ public:
                 uint_16 tile_size = params.OX0 * params.OY0;
                 DTYPE_SERIAL buffer[accumbuffersize][OC0];
 
-                // #pragma hls_pipeline_init_interval 1
+                #pragma hls_pipeline_init_interval 1
                 for(int i = 0; i < tile_size; i++){
                     DTYPE input = inputChannel.read();
                     #pragma hls_unroll yes
                     for(int j = 0; j < OC0; j++){
-                        buffer[i][j] = input.value[j];
-                    }
-                }
-
-                // #pragma hls_pipeline_init_interval 1
-                for(int i = 0; i < tile_size; i++){
-                    for(int j = 0; j < OC0; j++){
-                        serialOutChannel.write(buffer[i][j]);
+                        serialOutChannel.write(input.value[j]);
                     }
                 }
             }

@@ -324,6 +324,17 @@ public:
                         if (fy == params.FY) {
                             fy = 0;
                             ic1++;
+                        }
+                    }
+                } else {
+                    step++;
+                }
+                    if (fx == params.FX) {
+                        fx = 0;
+                        fy++;
+                        if (fy == params.FY) {
+                            fy = 0;
+                            ic1++;
                             if (ic1 == params.IC1) {
                                 break;
                             }
