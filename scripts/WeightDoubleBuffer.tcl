@@ -22,12 +22,11 @@ set word_width [expr ${ARRAY_DIMENSION} * 8]
 set block_size ${ARRAY_DIMENSION}
 
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/mem:cns -STAGE_REPLICATION 2
-directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferWriter<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/tmp -BLOCK_SIZE $block_size
-directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferReader<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/tmp -BLOCK_SIZE $block_size
+directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/weightDoubleBufferWriter/tmp -BLOCK_SIZE $block_size
+directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/weightDoubleBufferReader/tmp -BLOCK_SIZE $block_size
 
-
-directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferReader<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/din -WORD_WIDTH $word_width
-directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferWriter<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/dout -WORD_WIDTH $word_width
+directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/weightDoubleBufferReader/din -WORD_WIDTH $word_width
+directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/weightDoubleBufferWriter/dout -WORD_WIDTH $word_width
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/mem -WORD_WIDTH $word_width
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/.../temp.data.value -match glob -WORD_WIDTH $word_width
 
