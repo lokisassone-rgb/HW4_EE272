@@ -35,7 +35,7 @@ public:
                         //#pragma hls_pipeline_init_interval 1
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
                             inputItem = din.read();
-                            #pragma hls_unroll yes
+                           // #pragma hls_unroll yes
                             for (int i = 0; i < 4; i++) {
                                 temp.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i]; //
                             }
