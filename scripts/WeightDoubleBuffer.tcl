@@ -19,15 +19,19 @@ go assembly
 # Set the correct word widths and the stage replication
 # Your code starts here
 set word_width [expr ${ARRAY_DIMENSION} * 8]
+set block_size ${ARRAY_DIMENSION}
+
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/mem:cns -STAGE_REPLICATION 2
-directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferWriter<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/writer_buffer -BLOCK_SIZE 4
-directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferReader<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/reader_buffer -BLOCK_SIZE 4
- 
+directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferWriter<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/tmp -BLOCK_SIZE $block_size
+directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferReader<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/tmp -BLOCK_SIZE $block_size
+
 
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferReader<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/din -WORD_WIDTH $word_width
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/WeightDoubleBufferWriter<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/dout -WORD_WIDTH $word_width
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/mem -WORD_WIDTH $word_width
 directive set /WeightDoubleBuffer<8192,${ARRAY_DIMENSION},${ARRAY_DIMENSION}>/.../temp.data.value -match glob -WORD_WIDTH $word_width
+
+
 # Your code ends here
 # -------------------------------
 
