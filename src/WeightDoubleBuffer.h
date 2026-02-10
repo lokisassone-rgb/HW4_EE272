@@ -28,18 +28,19 @@ public:
 
                     chanStruct<PackedInt<WEIGHT_PRECISION, OC0>, size> temp; //create a new tile
                     PackedInt<WEIGHT_PRECISION, 4> inputItem;
+                    PackedInt<WEIGHT_PRECISION, OC0> tempdinwrite;
 
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
                     for (int tileItemIdx = 0; tileItemIdx < size; tileItemIdx++) {
                         if (tileItemIdx >= numTileItems) { break; }
-                        //#pragma hls_pipeline_init_interval 1
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
                             inputItem = din.read();
-                           // #pragma hls_unroll yes
-                            for (int i = 0; i < 4; i++) {
-                                temp.data[tileItemIdx].value[4*inputItemIdx + i] = inputItem.value[i]; //
-                            }
+                            tempdinwrite.value[4*inputItemIdx] = inputItem.value[0];
+                            tempdinwrite.value[4*inputItemIdx + 1] = inputItem.value[1];
+                            tempdinwrite.value[4*inputItemIdx + 2] = inputItem.value[2];
+                            tempdinwrite.value[4*inputItemIdx + 3] = inputItem.value[3];
                         }
+                        temp.data[tileItemIdx] = tempdinwrite;
                     }
 
                     dout.write(temp); 
