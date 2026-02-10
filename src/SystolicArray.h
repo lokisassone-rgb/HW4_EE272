@@ -23,13 +23,35 @@ void run(ac_channel<Params> &paramsIn,
         // Generate the loop indices here for the systolic array.
         // Write the loop indices as well as the params out to channels.
         // Your code starts here
+        #ifndef __SYNTHESIS__
+        while (paramsIn.available(1))
+        #endif
+        {
         Params params = paramsIn.read();
-        for (int oy1=0; oy1 < params.OY1; oy1++){//loop through conv gold tb same way conv loop
-            for (int ox1=0; ox1< params.OX1; ox1++){
-                for (int oc1 = 0; oc1 < params.OC1; oc1++) {
-                    paramsOut.write(params);//write out params once per tile
+
+        #pragma hls_pipeline_init_interval 1
+        for (uint_16 p = 0; p < OX1_MAX * OY1_MAX; ++p) {
+            for(uint_16 oc1 = 0; oc1 < OC1_MAX; ++oc1){
+                for (uint_16 ic1 = 0; ic1 < IC1_MAX; ++ic1) {
+                    for (uint_16 fx = 0; fx < FX_MAX; ++fx) {
+                        for (uint_16 fy = 0; fy < FY_MAX; ++fy) {
+                            LoopIndices loopIndices = {
+                                ic1, 
+                                fx, 
+                                fy
+                            };
+                            loopIndicesOut.write(loopIndices);
+                            paramsOut.write(params);
+                            if (fy == params.FY - 1) break;
+                        }
+                        if (fx == params.FX - 1) break;
+                    }
+                    if (ic1 == params.IC1 - 1) break;
                 }
+                if (oc1 == params.OC1 - 1) break;
             }
+            if (p == params.OX1 * params.OY1 - 1) break;
+        }
         }
         // Your code ends here
         // -------------------------------
@@ -43,6 +65,7 @@ public:
     SystolicArrayWrapper(){}
     
 #pragma hls_design interface
+#pragma hls_pipeline_init_interval 1
     void run(ac_channel<PackedInt<INPUT_PRECISION, IC0> > &input, 
              ac_channel<PackedInt<WEIGHT_PRECISION, OC0> > &weight, 
              ac_channel<PackedInt<OUTPUT_PRECISION, OC0> > &output,
