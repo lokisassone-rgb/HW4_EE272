@@ -33,6 +33,7 @@ public:
                     int numTileItems = int(params.IC1) * int(params.FY) * int(params.FX) * IC0;
                     for (int tileItemIdx = 0; tileItemIdx < size; tileItemIdx++) {
                         if (tileItemIdx >= numTileItems) { break; }
+                        #pragma hls_unroll yes
                         for (int inputItemIdx = 0; inputItemIdx < OC0/4; inputItemIdx++) {
                             inputItem = din.read();
                             tempdinwrite.value[4*inputItemIdx] = inputItem.value[0];
