@@ -23,9 +23,9 @@ public:
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
-
+        
+        #pragma hls_pipeline_init_interval 1
         for (int i=0; i < numberofTiles; i++){
-            #pragma hls_pipeline_init_interval 1
             for (int j=0; j < sizeofDoubleBuffer; j++){
                 #pragma hls_unroll yes
                 for (int idx = 0; idx < IC0; idx++) {
