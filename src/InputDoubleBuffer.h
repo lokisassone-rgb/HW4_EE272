@@ -23,7 +23,7 @@ public:
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
-        
+
         #pragma hls_pipeline_init_interval 1
         for (int i=0; i < numberofTiles; i++){
             for (int j=0; j < sizeofDoubleBuffer; j++){
@@ -31,6 +31,7 @@ public:
                 for (int idx = 0; idx < IC0; idx++) {
                     tempdinwrite.value[idx] = 0;
                 }
+                #pragma hls_unroll yes
                 for (int k=0; k<IC0/4; k++){
                     tempdinread = din.read();
                     tempdinwrite.value[k*4] = tempdinread.value[0];
