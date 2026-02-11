@@ -14,7 +14,6 @@ public:
         // -------------------------------
         // Your code starts here
         Params params = paramsIn.read();
-        int numberofTiles = params.OX1 * params.OY1;
         int ix0 = (params.OX0 -1 )*params.STRIDE + params.FX;
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY;
         int sizeofDoubleBuffer = ix0*iy0*params.IC1;
@@ -24,9 +23,12 @@ public:
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
         
-        #pragma hls_pipeline_init_interval 1
-        for (int i=0; i < numberofTiles; i++){
-            for (int j=0; j < sizeofDoubleBuffer; j++){
+        for (int oy1 = 0; oy1 < OY1_MAX; oy1++){
+            if (oy1 >= params.OY1) { break; }
+            for (int ox1 = 0; ox1 < OX1_MAX; ox1++){
+                if (ox1 >= params.OX1) { break; }
+                for (int j = 0; j < size; j++){
+                    if (j >= sizeofDoubleBuffer) { break; }
                 #pragma hls_unroll yes
                 for (int idx = 0; idx < IC0; idx++) {
                     tempdinwrite.value[idx] = 0;
@@ -39,10 +41,11 @@ public:
                     tempdinwrite.value[k*4+3] = tempdinread.value[3];
                 }
                 
-                temp.data[j] = tempdinwrite;
+                    temp.data[j] = tempdinwrite;
+                }
+                
+                dout.write(temp);
             }
-            
-            dout.write(temp);
         }
         // Your code ends here
         // -------------------------------
@@ -64,20 +67,26 @@ public:
         Params params = paramsIn.read();
         int ix0 = (params.OX0 -1 )*params.STRIDE + params.FX; //calculate input width
         int iy0 = (params.OY0 -1 )*params.STRIDE + params.FY; //calculate input height
-        int numberofTiles = params.OX1 * params.OY1;
-
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp; //initialize tile struct
         #pragma hls_pipeline_init_interval 1
-        for (int oy1 = 0; oy1 < params.OY1; oy1++){ //read in inputs in same input tiling as mentioned in review session week 3
-            for (int ox1 = 0; ox1 < params.OX1; ox1++){
+        for (int oy1 = 0; oy1 < OY1_MAX; oy1++){ //read in inputs in same input tiling as mentioned in review session week 3
+            if (oy1 >= params.OY1) { break; }
+            for (int ox1 = 0; ox1 < OX1_MAX; ox1++){
+                if (ox1 >= params.OX1) { break; }
                 temp = din.read(); //create new tile 
-                for (int oc1 = 0; oc1 < params.OC1; oc1++){
-                    for (int ic1 = 0; ic1 < params.IC1; ic1++){
-                        for (int fy = 0; fy < params.FY; fy++){
-                            for (int fx = 0; fx < params.FX; fx++){
-                                for (int oy0 = 0; oy0 < params.OY0; oy0++){
+                for (int oc1 = 0; oc1 < OC1_MAX; oc1++){
+                    if (oc1 >= params.OC1) { break; }
+                    for (int ic1 = 0; ic1 < IC1_MAX; ic1++){
+                        if (ic1 >= params.IC1) { break; }
+                        for (int fy = 0; fy < FY_MAX; fy++){
+                            if (fy >= params.FY) { break; }
+                            for (int fx = 0; fx < FX_MAX; fx++){
+                                if (fx >= params.FX) { break; }
+                                for (int oy0 = 0; oy0 < OY0_MAX; oy0++){
+                                    if (oy0 >= params.OY0) { break; }
                                     #pragma hls_pipeline_init_interval 1
-                                    for (int ox0 = 0; ox0 < params.OX0; ox0++){ //skip IC0 as unrolled in inputs
+                                    for (int ox0 = 0; ox0 < OX0_MAX; ox0++){ //skip IC0 as unrolled in inputs
+                                        if (ox0 >= params.OX0) { break; }
                                         int iy = oy0 * params.STRIDE + fy;
                                         int ix = ox0 * params.STRIDE + fx;
                                         int buffer_add = ic1 * (iy0 * ix0) + iy * ix0 + ix; //calculate address linearly
