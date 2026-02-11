@@ -27,7 +27,6 @@ public:
         #pragma hls_pipeline_init_interval 1
         for (int i=0; i < numberofTiles; i++){
             for (int j=0; j < sizeofDoubleBuffer; j++){
-                #pragma hls_unroll yes
                 for (int idx = 0; idx < IC0; idx++) {
                     tempdinwrite.value[idx] = 0;
                 }
