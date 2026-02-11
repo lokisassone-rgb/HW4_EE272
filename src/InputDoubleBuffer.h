@@ -23,14 +23,14 @@ public:
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp;
         PackedInt<INPUT_PRECISION, 4> tempdinread;
         PackedInt<INPUT_PRECISION, IC0> tempdinwrite;
-
+        
         #pragma hls_pipeline_init_interval 1
         for (int i=0; i < numberofTiles; i++){
             for (int j=0; j < sizeofDoubleBuffer; j++){
+                #pragma hls_unroll yes
                 for (int idx = 0; idx < IC0; idx++) {
                     tempdinwrite.value[idx] = 0;
                 }
-                #pragma hls_unroll yes
                 for (int k=0; k<IC0/4; k++){
                     tempdinread = din.read();
                     tempdinwrite.value[k*4] = tempdinread.value[0];
@@ -67,7 +67,7 @@ public:
         int numberofTiles = params.OX1 * params.OY1;
 
         chanStruct<PackedInt<INPUT_PRECISION,IC0>,size> temp; //initialize tile struct
-
+        #pragma hls_pipeline_init_interval 1
         for (int oy1 = 0; oy1 < params.OY1; oy1++){ //read in inputs in same input tiling as mentioned in review session week 3
             for (int ox1 = 0; ox1 < params.OX1; ox1++){
                 temp = din.read(); //create new tile 
